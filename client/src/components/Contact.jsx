@@ -136,23 +136,23 @@ export default function Contact({ settings }) {
               Interested in a piece? Want to place a custom order? Reach out directly — we respond fast.
             </p>
             <div className="contact-channels">
-              
-                href={`https://wa.me/${settings?.whatsapp || '233000000000'}`}
+
+              <a href={`https://wa.me/${settings?.whatsapp || '233546805804'}`}
                 target="_blank" rel="noreferrer"
-                className="contact-channel"
-              <a>
+                className="contact-channel">
+
                 <div className="contact-channel-icon">💬</div>
                 <div>
                   <div className="contact-channel-label">WhatsApp</div>
-                  <div className="contact-channel-value">{settings?.phone || '+233 000 000 000'}</div>
+                  <div className="contact-channel-value">{settings?.phone || '+233 546 805 804'}</div>
                 </div>
                 <div className="contact-channel-arrow">→</div>
               </a>
-              
+
+              <a
                 href={settings?.instagram || 'https://instagram.com'}
                 target="_blank" rel="noreferrer"
-                className="contact-channel"
-              <a>
+                className="contact-channel">
                 <div className="contact-channel-icon">📸</div>
                 <div>
                   <div className="contact-channel-label">Instagram</div>
