@@ -1,7 +1,27 @@
+import { useState, useEffect } from 'react'
+import Navbar from '../components/Navbar'
+import Hero from '../components/Hero'
+import Collections from '../components/Collections'
+import About from '../components/About'
+import Contact from '../components/Contact'
+import Footer from '../components/Footer'
+import { fetchSettings } from '../utils/api'
+
 export default function Home() {
+  const [settings, setSettings] = useState({})
+
+  useEffect(() => {
+    fetchSettings().then(setSettings).catch(console.error)
+  }, [])
+
   return (
-    <div style={{ minHeight:'100vh', background:'#0a0806', display:'flex', alignItems:'center', justifyContent:'center' }}>
-      <div style={{ fontFamily:'Georgia,serif', fontSize:32, color:'#c9933a', letterSpacing:'0.2em', textTransform:'uppercase' }}>The Bills — Coming Soon</div>
+    <div style={{ background:'#0a0806' }}>
+      <Navbar />
+      <Hero settings={settings} />
+      <Collections settings={settings} />
+      <About settings={settings} />
+      <Contact settings={settings} />
+      <Footer settings={settings} />
     </div>
   )
 }

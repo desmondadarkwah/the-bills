@@ -9,6 +9,7 @@ import { getSettings, updateSettings } from '../controllers/settingsController.j
 
 const router = express.Router()
 
+// console.log('setupAdmin type:', typeof setupAdmin)
 // ─── HEALTH ───────────────────────────────────────────
 router.get('/health', (req, res) => res.json({ message: 'The Bills server is running ✅' }))
 

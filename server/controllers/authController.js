@@ -9,6 +9,7 @@ export const setupAdmin = async (req, res) => {
     const exists = await Admin.findOne()
     if (exists) return res.status(400).json({ error: 'Admin already exists.' })
     const { email, password } = req.body
+    if (!email || !password) return res.status(400).json({ error: 'Email and password required.' })
     const admin = await Admin.create({ email, password })
     res.status(201).json({ success: true, token: generateToken(admin._id), admin: { id: admin._id, email: admin.email } })
   } catch (err) {
