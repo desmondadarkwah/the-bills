@@ -1,7 +1,7 @@
 export default function Contact({ settings }) {
   const handleWhatsApp = () => {
     const msg = `Hello The Bills! I'd like to get in touch.`
-    window.open(`https://wa.me/${settings?.whatsapp || '233000000000'}?text=${encodeURIComponent(msg)}`, '_blank')
+    window.open(`https://wa.me/${settings?.whatsapp || '233546804804'}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   return (
