@@ -139,7 +139,7 @@ export default function Footer({ settings }) {
 
           <div className="footer-bottom">
             <div className="footer-copy">
-              © {year} <span>The Bills</span>. All rights reserved.
+              © {year} <span>{settings?.brandName || 'The Bills'}</span>. All rights reserved.
             </div>
             <div className="footer-copy">
               Accra, Ghana · Crafted for the world

@@ -15,8 +15,8 @@ export default function Home() {
   }, [])
 
   return (
-    <div style={{ background:'#0a0806' }}>
-      <Navbar />
+    <div style={{ background: '#0a0806' }}>
+      <Navbar settings={settings} />
       <Hero settings={settings} />
       <Collections settings={settings} />
       <About settings={settings} />

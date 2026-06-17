@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function Navbar() {
+export default function Navbar({ settings }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const links = ['Collections', 'About', 'Contact']
@@ -100,7 +100,7 @@ export default function Navbar() {
       <nav className="nav-root">
         <a href="/" className="nav-logo">
           <div className="nav-logo-dot" />
-          The Bills
+          {settings?.brandName || 'The Bills'}
         </a>
 
         <div className="nav-desktop">
@@ -133,3 +133,7 @@ export default function Navbar() {
     </>
   )
 }
+
+
+// Email: admin@thebills.com
+// Password: thebills2024
