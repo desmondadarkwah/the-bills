@@ -9,19 +9,19 @@ const WhatsAppIcon = () => (
 )
 
 const HeartIcon = ({ filled }) => (
-  <svg width="16" height="16" fill={filled ? '#c9933a' : 'none'} stroke="#c9933a" strokeWidth="2" viewBox="0 0 24 24">
+  <svg width="15" height="15" fill={filled ? '#c9933a' : 'none'} stroke="#c9933a" strokeWidth="1.5" viewBox="0 0 24 24">
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   </svg>
 )
 
 export default function Collections({ settings }) {
-  const [products, setProducts]     = useState([])
-  const [collections, setCollections] = useState([])
+  const [products, setProducts]         = useState([])
+  const [collections, setCollections]   = useState([])
   const [activeFilter, setActiveFilter] = useState('All')
-  const [loading, setLoading]       = useState(true)
-  const [selected, setSelected]     = useState([])
-  const [wishlist, setWishlist]     = useState([])
-  const [selectMode, setSelectMode] = useState(false)
+  const [loading, setLoading]           = useState(true)
+  const [selected, setSelected]         = useState([])
+  const [wishlist, setWishlist]         = useState([])
+  const [selectMode, setSelectMode]     = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function Collections({ settings }) {
     if (saved) setWishlist(JSON.parse(saved))
   }, [])
 
-  const filters = ['All', ...collections.map(c => c.name)]
+  const filters  = ['All', ...collections.map(c => c.name)]
   const filtered = activeFilter === 'All' ? products : products.filter(p => p.category === activeFilter)
 
   const toggleWishlist = (id) => {
@@ -55,7 +55,7 @@ export default function Collections({ settings }) {
 
   const handleBulkWhatsApp = (items) => {
     const list = items.map((p, i) => `${i + 1}. *${p.name}* — ${p.price}`).join('\n')
-    const msg = `Hello The Bills!\n\nI'm interested in the following pieces:\n\n${list}\n\nPlease provide more details. Thank you!`
+    const msg  = `Hello The Bills!\n\nI'm interested in the following pieces:\n\n${list}\n\nPlease provide more details. Thank you!`
     window.open(`https://wa.me/${settings?.whatsapp || '233000000000'}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
@@ -67,23 +67,26 @@ export default function Collections({ settings }) {
   return (
     <>
       <style>{`
+        /* ── ROOT ── */
         .col-root {
           background: #0a0806;
-          padding: 120px 48px;
+          padding: 140px 56px 120px;
           position: relative;
         }
         .col-root::before {
           content: '';
-          position: absolute; top: 0; left: 48px; right: 48px;
+          position: absolute; top: 0; left: 56px; right: 56px;
           height: 1px; background: rgba(201,147,58,0.15);
         }
+
+        /* ── HEADER ── */
         .col-header {
           display: flex; align-items: flex-end;
           justify-content: space-between;
-          margin-bottom: 48px; gap: 24px; flex-wrap: wrap;
+          margin-bottom: 56px; gap: 24px; flex-wrap: wrap;
         }
         .col-eyebrow {
-          display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+          display: flex; align-items: center; gap: 16px; margin-bottom: 18px;
         }
         .col-eyebrow-line { width: 32px; height: 1px; background: #c9933a; }
         .col-eyebrow span {
@@ -97,154 +100,272 @@ export default function Collections({ settings }) {
           color: #f5ede0; text-transform: uppercase; margin: 0;
         }
         .col-title em { font-style: italic; color: #c9933a; }
+
+        /* ── TOOLBAR ── */
         .col-toolbar {
-          display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+          display: flex; align-items: center;
+          gap: 10px; flex-wrap: wrap;
+          justify-content: flex-end;
         }
         .col-filters {
-          display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+          display: flex; align-items: center;
+          gap: 6px; flex-wrap: wrap;
         }
         .col-filter-btn {
-          font-family: 'Barlow', sans-serif; font-size: 10px;
-          letter-spacing: 0.2em; text-transform: uppercase;
-          padding: 8px 20px; border: 1px solid rgba(201,147,58,0.2);
-          background: transparent; color: rgba(245,237,224,0.4);
+          font-family: 'Barlow', sans-serif; font-size: 9px;
+          letter-spacing: 0.22em; text-transform: uppercase;
+          padding: 8px 18px;
+          border: 1px solid rgba(201,147,58,0.18);
+          background: transparent; color: rgba(245,237,224,0.35);
           cursor: pointer; transition: all 0.2s;
         }
-        .col-filter-btn:hover { border-color: rgba(201,147,58,0.5); color: rgba(245,237,224,0.7); }
-        .col-filter-btn.active { background: #c9933a; color: #0a0806; border-color: #c9933a; }
+        .col-filter-btn:hover {
+          border-color: rgba(201,147,58,0.45);
+          color: rgba(245,237,224,0.65);
+        }
+        .col-filter-btn.active {
+          background: #c9933a; color: #0a0806; border-color: #c9933a;
+        }
+
+        /* toolbar divider */
+        .col-toolbar-sep {
+          width: 1px; height: 18px;
+          background: rgba(201,147,58,0.15); flex-shrink: 0;
+        }
+
         .col-action-btn {
-          font-family: 'Barlow', sans-serif; font-size: 10px; font-weight: 500;
+          font-family: 'Barlow', sans-serif; font-size: 9px; font-weight: 500;
           letter-spacing: 0.2em; text-transform: uppercase;
-          padding: 8px 20px; border: none; cursor: pointer; transition: all 0.2s;
-          display: flex; align-items: center; gap: 8px;
+          padding: 8px 16px; cursor: pointer; transition: all 0.2s;
+          display: flex; align-items: center; gap: 7px; border: none;
+          background: none; white-space: nowrap;
         }
-        .col-action-btn-select { background: rgba(201,147,58,0.1); color: #c9933a; border: 1px solid rgba(201,147,58,0.3); }
-        .col-action-btn-select:hover { background: rgba(201,147,58,0.2); }
-        .col-action-btn-select.active { background: #c9933a; color: #0a0806; }
-        .col-action-btn-wishlist { background: transparent; color: rgba(245,237,224,0.5); border: 1px solid rgba(245,237,224,0.1); }
-        .col-action-btn-wishlist:hover { border-color: #c9933a; color: #c9933a; }
-        .col-bulk-bar {
-          position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
-          background: #0a0806; border-top: 1px solid rgba(201,147,58,0.2);
-          padding: 16px 48px;
-          display: flex; align-items: center; justify-content: space-between; gap: 16px;
-          transform: translateY(100%);
-          transition: transform 0.3s cubic-bezier(0.77,0,0.18,1);
+        .col-action-btn-select {
+          color: rgba(201,147,58,0.7);
+          border: 1px solid rgba(201,147,58,0.2) !important;
+          background: rgba(201,147,58,0.04) !important;
         }
-        .col-bulk-bar.visible { transform: translateY(0); }
-        .col-bulk-bar-text {
-          font-family: 'Cormorant Garamond', serif;
-          font-weight: 400; font-size: 18px;
-          color: #f5ede0; letter-spacing: 0.04em;
+        .col-action-btn-select:hover {
+          background: rgba(201,147,58,0.1) !important;
+          color: #c9933a;
         }
-        .col-bulk-bar-text span { color: #c9933a; }
-        .col-bulk-actions { display: flex; gap: 10px; }
-        .col-bulk-btn {
-          font-family: 'Barlow', sans-serif; font-size: 10px; font-weight: 500;
-          letter-spacing: 0.2em; text-transform: uppercase;
-          padding: 12px 28px; border: none; cursor: pointer; transition: opacity 0.2s;
+        .col-action-btn-select.active {
+          background: rgba(201,147,58,0.12) !important;
+          border-color: rgba(201,147,58,0.4) !important;
+          color: #c9933a;
         }
-        .col-bulk-btn-wa { background: #25D366; color: #fff; }
-        .col-bulk-btn-clear { background: transparent; color: rgba(245,237,224,0.4); border: 1px solid rgba(245,237,224,0.1); }
-        .col-bulk-btn:hover { opacity: 0.85; }
+        .col-action-btn-wishlist {
+          color: rgba(245,237,224,0.35);
+          border: 1px solid rgba(245,237,224,0.08) !important;
+        }
+        .col-action-btn-wishlist:hover {
+          border-color: rgba(201,147,58,0.3) !important;
+          color: rgba(201,147,58,0.8);
+        }
+
+        /* ── GRID ── */
         .col-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
           gap: 2px;
         }
+
+        /* ── CARD ── */
         .col-card {
           position: relative; overflow: hidden;
-          background: #111009; cursor: pointer;
+          background: #100e0a; cursor: pointer;
         }
+        /* selected outline */
         .col-card.selected::after {
           content: '';
           position: absolute; inset: 0;
           border: 2px solid #c9933a;
           pointer-events: none; z-index: 3;
         }
+
+        /* image */
         .col-card-img {
-          width: 100%; height: 420px; object-fit: cover; display: block;
-          transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+          width: 100%; height: 440px; object-fit: cover; display: block;
+          transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
         }
-        .col-card:hover .col-card-img { transform: scale(1.05); }
+        .col-card:hover .col-card-img { transform: scale(1.06); }
+
+        /* placeholder */
         .col-card-placeholder {
-          width: 100%; height: 420px;
-          background: linear-gradient(135deg, #1a1208 0%, #0d0a06 100%);
+          width: 100%; height: 440px;
+          background: linear-gradient(160deg, #1a1208 0%, #0d0a06 100%);
           display: flex; align-items: center; justify-content: center;
+          position: relative; overflow: hidden;
+        }
+        .col-card-placeholder::before {
+          content: '';
+          position: absolute; inset: 0;
+          background: repeating-linear-gradient(
+            -45deg, transparent, transparent 20px,
+            rgba(201,147,58,0.02) 20px, rgba(201,147,58,0.02) 21px
+          );
         }
         .col-card-placeholder-text {
           font-family: 'Cormorant Garamond', serif;
-          font-weight: 300; font-size: 64px;
-          color: rgba(201,147,58,0.08);
+          font-weight: 700; font-size: 80px;
+          color: rgba(201,147,58,0.07); letter-spacing: -0.04em;
+          text-transform: uppercase; position: relative; z-index: 1;
         }
+
+        /* wishlist btn */
         .col-heart-btn {
-          position: absolute; top: 16px; right: 16px; z-index: 4;
-          width: 36px; height: 36px;
-          background: rgba(10,8,6,0.7); border: 1px solid rgba(201,147,58,0.2);
+          position: absolute; top: 14px; right: 14px; z-index: 4;
+          width: 34px; height: 34px;
+          background: rgba(10,8,6,0.65);
+          border: 1px solid rgba(201,147,58,0.2);
           display: flex; align-items: center; justify-content: center;
-          cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px);
+          cursor: pointer; transition: all 0.2s;
+          backdrop-filter: blur(4px);
         }
-        .col-heart-btn:hover { background: rgba(10,8,6,0.9); border-color: #c9933a; }
+        .col-heart-btn:hover {
+          background: rgba(10,8,6,0.9); border-color: rgba(201,147,58,0.6);
+        }
+
+        /* select checkbox */
         .col-select-check {
-          position: absolute; top: 16px; left: 16px; z-index: 4;
-          width: 24px; height: 24px;
-          background: rgba(10,8,6,0.7); border: 1px solid rgba(201,147,58,0.4);
+          position: absolute; top: 14px; left: 14px; z-index: 4;
+          width: 22px; height: 22px;
+          background: rgba(10,8,6,0.65);
+          border: 1px solid rgba(201,147,58,0.4);
           display: flex; align-items: center; justify-content: center;
           cursor: pointer; transition: all 0.2s;
         }
         .col-select-check.checked { background: #c9933a; border-color: #c9933a; }
-        .col-select-check span { font-size: 12px; color: #0a0806; font-weight: 700; }
+        .col-select-check span { font-size: 11px; color: #0a0806; font-weight: 700; }
+
+        /* always-visible info strip */
         .col-card-info {
           position: absolute; bottom: 0; left: 0; right: 0;
-          padding: 24px 28px;
-          background: linear-gradient(to top, rgba(10,8,6,0.98) 0%, transparent 100%);
+          padding: 32px 22px 18px;
+          background: linear-gradient(to top, rgba(10,8,6,0.97) 0%, transparent 100%);
+          pointer-events: none;
         }
         .col-card-category {
           font-family: 'Barlow', sans-serif; font-size: 9px;
-          letter-spacing: 0.3em; text-transform: uppercase; color: #c9933a; margin-bottom: 6px;
+          letter-spacing: 0.3em; text-transform: uppercase;
+          color: #c9933a; margin-bottom: 5px;
         }
         .col-card-name {
-          font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 20px;
-          color: #f5ede0; letter-spacing: 0.04em; margin-bottom: 4px; text-transform: uppercase;
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 500; font-size: 19px;
+          color: #f5ede0; letter-spacing: 0.04em;
+          margin-bottom: 3px; text-transform: uppercase;
         }
         .col-card-price {
-          font-family: 'Barlow', sans-serif; font-size: 12px;
-          color: rgba(245,237,224,0.4); letter-spacing: 0.1em;
+          font-family: 'Barlow', sans-serif; font-size: 11px;
+          color: rgba(245,237,224,0.35); letter-spacing: 0.12em;
         }
+
+        /* hover overlay with action buttons */
         .col-card-overlay {
           position: absolute; inset: 0;
-          background: linear-gradient(to top, rgba(10,8,6,0.95) 0%, rgba(10,8,6,0.2) 60%, transparent 100%);
           display: flex; flex-direction: column; justify-content: flex-end;
-          padding: 28px; opacity: 0; transition: opacity 0.3s;
+          padding: 22px;
+          background: linear-gradient(to top, rgba(10,8,6,0.96) 0%, rgba(10,8,6,0.18) 55%, transparent 100%);
+          opacity: 0; transition: opacity 0.3s;
+          pointer-events: none;
         }
-        .col-card:hover .col-card-overlay { opacity: 1; }
-        .col-card-actions { display: flex; gap: 8px; margin-top: 16px; }
+        .col-card:hover .col-card-overlay { opacity: 1; pointer-events: auto; }
+
+        /* on mobile — overlay always visible */
+        @media (max-width: 768px) {
+          .col-card-overlay { opacity: 1; pointer-events: auto; }
+        }
+
+        .col-card-actions { display: flex; gap: 6px; margin-top: 60px; }
         .col-card-btn {
-          flex: 1; padding: 10px 12px;
+          flex: 1; padding: 10px 8px;
           font-family: 'Barlow', sans-serif; font-size: 9px; font-weight: 500;
           letter-spacing: 0.2em; text-transform: uppercase;
           border: none; cursor: pointer;
           display: flex; align-items: center; justify-content: center; gap: 6px;
           transition: opacity 0.2s;
         }
-        .col-card-btn:hover { opacity: 0.85; }
-        .col-card-btn-wa { background: #25D366; color: #fff; }
-        .col-card-btn-dm { background: rgba(201,147,58,0.15); color: #c9933a; border: 1px solid rgba(201,147,58,0.3); }
-        .col-empty { grid-column: 1/-1; padding: 80px 0; text-align: center; }
-        .col-empty-text {
-          font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 18px;
-          color: rgba(245,237,224,0.2); letter-spacing: 0.1em;
+        .col-card-btn:hover { opacity: 0.82; }
+        .col-card-btn-wa  { background: #25D366; color: #fff; }
+        .col-card-btn-dm  {
+          background: rgba(201,147,58,0.1); color: #c9933a;
+          border: 1px solid rgba(201,147,58,0.25);
         }
-        @media (max-width: 768px) {
-          .col-root { padding: 80px 24px; }
-          .col-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-          .col-card-img { height: 340px; }
-          .col-card-overlay { opacity: 1; }
-          .col-bulk-bar { padding: 16px 24px; flex-direction: column; }
+
+        /* ── EMPTY STATE ── */
+        .col-empty {
+          grid-column: 1 / -1;
+          padding: 100px 0; text-align: center;
+        }
+        .col-empty-eyebrow {
+          font-family: 'Barlow', sans-serif; font-size: 9px;
+          letter-spacing: 0.35em; text-transform: uppercase;
+          color: rgba(201,147,58,0.3); margin-bottom: 16px;
+        }
+        .col-empty-text {
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 300; font-style: italic; font-size: 22px;
+          color: rgba(245,237,224,0.15); letter-spacing: 0.06em;
+        }
+
+        /* ── BULK BAR ── */
+        .col-bulk-bar {
+          position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+          background: #0d0a06;
+          border-top: 1px solid rgba(201,147,58,0.2);
+          padding: 18px 56px;
+          display: flex; align-items: center;
+          justify-content: space-between; gap: 16px;
+          transform: translateY(100%);
+          transition: transform 0.35s cubic-bezier(0.77,0,0.18,1);
+        }
+        .col-bulk-bar.visible { transform: translateY(0); }
+        .col-bulk-bar-left {
+          display: flex; align-items: center; gap: 14px;
+        }
+        .col-bulk-bar-dot {
+          width: 6px; height: 6px; border-radius: 50%;
+          background: #c9933a; flex-shrink: 0;
+        }
+        .col-bulk-bar-text {
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 400; font-size: 17px;
+          color: rgba(245,237,224,0.7); letter-spacing: 0.04em;
+        }
+        .col-bulk-bar-text span { color: #c9933a; font-weight: 600; }
+        .col-bulk-actions { display: flex; gap: 10px; }
+        .col-bulk-btn {
+          font-family: 'Barlow', sans-serif; font-size: 9px; font-weight: 500;
+          letter-spacing: 0.22em; text-transform: uppercase;
+          padding: 12px 28px; border: none; cursor: pointer;
+          transition: opacity 0.2s; white-space: nowrap;
+        }
+        .col-bulk-btn:hover { opacity: 0.85; }
+        .col-bulk-btn-wa    { background: #25D366; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .col-bulk-btn-clear { background: transparent; color: rgba(245,237,224,0.3); border: 1px solid rgba(245,237,224,0.08); }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+          .col-root        { padding: 100px 24px 100px; }
+          .col-root::before{ left: 24px; right: 24px; }
+          .col-grid        { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+          .col-card-img    { height: 360px; }
+          .col-card-placeholder { height: 360px; }
+          .col-header      { flex-direction: column; align-items: flex-start; margin-bottom: 36px; }
+          .col-toolbar     { justify-content: flex-start; }
+          .col-bulk-bar    { padding: 14px 24px; flex-direction: column; align-items: flex-start; gap: 12px; }
+          .col-bulk-actions{ width: 100%; }
+          .col-bulk-btn    { flex: 1; text-align: center; justify-content: center; }
+        }
+        @media (max-width: 480px) {
+          .col-grid { grid-template-columns: 1fr; }
         }
       `}</style>
 
       <section id="collections" className="col-root">
+
+        {/* Header */}
         <div className="col-header">
           <div>
             <div className="col-eyebrow">
@@ -253,37 +374,57 @@ export default function Collections({ settings }) {
             </div>
             <h2 className="col-title">Our <em>Pieces</em></h2>
           </div>
+
           <div className="col-toolbar">
             <div className="col-filters">
               {filters.map(f => (
-                <button key={f} className={`col-filter-btn${activeFilter === f ? ' active' : ''}`} onClick={() => setActiveFilter(f)}>{f}</button>
+                <button
+                  key={f}
+                  className={`col-filter-btn${activeFilter === f ? ' active' : ''}`}
+                  onClick={() => setActiveFilter(f)}
+                >
+                  {f}
+                </button>
               ))}
             </div>
+
+            <div className="col-toolbar-sep" />
+
             <button
               className={`col-action-btn col-action-btn-select${selectMode ? ' active' : ''}`}
               onClick={() => { setSelectMode(!selectMode); setSelected([]) }}
             >
               {selectMode ? '✕ Cancel' : '☑ Select'}
             </button>
+
             <button
               className="col-action-btn col-action-btn-wishlist"
               onClick={() => navigate('/wishlist')}
             >
-              ♡ Saved {wishlist.length > 0 && `(${wishlist.length})`}
+              ♡ Saved{wishlist.length > 0 ? ` (${wishlist.length})` : ''}
             </button>
           </div>
         </div>
 
+        {/* Grid */}
         {loading ? (
           <div className="col-grid">
             {[...Array(6)].map((_, i) => (
-              <div key={i} style={{ height:420, background:'linear-gradient(135deg,#1a1208,#0d0a06)', opacity:0.5 }} />
+              <div
+                key={i}
+                style={{
+                  height: 440,
+                  background: 'linear-gradient(160deg,#1a1208,#0d0a06)',
+                  opacity: 0.4 + i * 0.04,
+                }}
+              />
             ))}
           </div>
         ) : (
           <div className="col-grid">
             {filtered.length === 0 ? (
               <div className="col-empty">
+                <div className="col-empty-eyebrow">The Bills</div>
                 <div className="col-empty-text">No pieces available yet — check back soon.</div>
               </div>
             ) : (
@@ -293,6 +434,7 @@ export default function Collections({ settings }) {
                   className={`col-card${selected.includes(product._id) ? ' selected' : ''}`}
                   onClick={() => selectMode && toggleSelect(product._id)}
                 >
+                  {/* Wishlist */}
                   <button
                     className="col-heart-btn"
                     onClick={e => { e.stopPropagation(); toggleWishlist(product._id) }}
@@ -300,30 +442,43 @@ export default function Collections({ settings }) {
                     <HeartIcon filled={wishlist.includes(product._id)} />
                   </button>
 
+                  {/* Select checkbox */}
                   {selectMode && (
                     <div className={`col-select-check${selected.includes(product._id) ? ' checked' : ''}`}>
                       {selected.includes(product._id) && <span>✓</span>}
                     </div>
                   )}
 
-                  {product.images?.[0]
-                    ? <img src={product.images[0]} alt={product.name} className="col-card-img" />
-                    : <div className="col-card-placeholder"><span className="col-card-placeholder-text">TB</span></div>
-                  }
+                  {/* Image */}
+                  {product.images?.[0] ? (
+                    <img src={product.images[0]} alt={product.name} className="col-card-img" />
+                  ) : (
+                    <div className="col-card-placeholder">
+                      <span className="col-card-placeholder-text">TB</span>
+                    </div>
+                  )}
 
+                  {/* Always-visible info */}
                   <div className="col-card-info">
                     <div className="col-card-category">{product.category}</div>
                     <div className="col-card-name">{product.name}</div>
                     <div className="col-card-price">{product.price}</div>
                   </div>
 
+                  {/* Hover overlay */}
                   {!selectMode && (
                     <div className="col-card-overlay">
                       <div className="col-card-actions">
-                        <button className="col-card-btn col-card-btn-wa" onClick={e => { e.stopPropagation(); handleWhatsApp(product) }}>
+                        <button
+                          className="col-card-btn col-card-btn-wa"
+                          onClick={e => { e.stopPropagation(); handleWhatsApp(product) }}
+                        >
                           <WhatsAppIcon /> WhatsApp
                         </button>
-                        <button className="col-card-btn col-card-btn-dm" onClick={e => { e.stopPropagation(); window.open(settings?.instagram || '#', '_blank') }}>
+                        <button
+                          className="col-card-btn col-card-btn-dm"
+                          onClick={e => { e.stopPropagation(); window.open(settings?.instagram || '#', '_blank') }}
+                        >
                           DM Us
                         </button>
                       </div>
@@ -336,14 +491,18 @@ export default function Collections({ settings }) {
         )}
       </section>
 
+      {/* Bulk action bar */}
       <div className={`col-bulk-bar${selected.length > 0 ? ' visible' : ''}`}>
-        <div className="col-bulk-bar-text">
-          <span>{selected.length}</span> {selected.length === 1 ? 'piece' : 'pieces'} selected
+        <div className="col-bulk-bar-left">
+          <div className="col-bulk-bar-dot" />
+          <div className="col-bulk-bar-text">
+            <span>{selected.length}</span> {selected.length === 1 ? 'piece' : 'pieces'} selected
+          </div>
         </div>
         <div className="col-bulk-actions">
           <button className="col-bulk-btn col-bulk-btn-clear" onClick={clearSelect}>Clear</button>
           <button className="col-bulk-btn col-bulk-btn-wa" onClick={handleBulkEnquire}>
-            <WhatsAppIcon /> &nbsp; Enquire on All
+            <WhatsAppIcon /> Enquire on All
           </button>
         </div>
       </div>
