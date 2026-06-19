@@ -5,18 +5,24 @@ import Collections from '../components/Collections'
 import About from '../components/About'
 import Contact from '../components/Contact'
 import Footer from '../components/Footer'
-import { fetchSettings } from '../utils/api'
+import Loader from '../components/Loader'
 import WhatsAppButton from '../components/WhatsAppButton'
+import { fetchSettings } from '../utils/api'
 
 export default function Home() {
   const [settings, setSettings] = useState({})
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    fetchSettings().then(setSettings).catch(console.error)
+    fetchSettings()
+      .then(setSettings)
+      .catch(console.error)
+      .finally(() => setReady(true))
   }, [])
 
   return (
-    <div style={{ background: '#0a0806' }}>
+    <div style={{ background:'#0a0806' }}>
+      {!ready && <Loader />}
       <Navbar settings={settings} />
       <Hero settings={settings} />
       <Collections settings={settings} />
@@ -27,3 +33,4 @@ export default function Home() {
     </div>
   )
 }
+
