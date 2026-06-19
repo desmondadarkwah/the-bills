@@ -7,11 +7,12 @@ export default function About({ settings }) {
           padding: 120px 48px;
           position: relative;
           overflow: hidden;
+          font-family: 'Barlow', sans-serif;
         }
-        .about-root::before {
-          content: '';
+        .about-top-line {
           position: absolute; top: 0; left: 48px; right: 48px;
-          height: 1px; background: rgba(201,147,58,0.15);
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(201,147,58,0.22) 30%, rgba(201,147,58,0.22) 70%, transparent);
         }
         .about-watermark {
           position: absolute;
@@ -23,7 +24,7 @@ export default function About({ settings }) {
         }
         .about-inner {
           max-width: 1200px; margin: 0 auto;
-          display: grid; grid-template-columns: 1fr 1fr;
+          display: grid; grid-template-columns: 1fr 0.85fr;
           gap: 80px; align-items: center; position: relative; z-index: 1;
         }
         .about-eyebrow {
@@ -31,7 +32,7 @@ export default function About({ settings }) {
         }
         .about-eyebrow-line { width: 32px; height: 1px; background: #c9933a; }
         .about-eyebrow span {
-          font-family: 'Barlow', sans-serif; font-size: 10px;
+          font-size: 10px;
           letter-spacing: 0.35em; text-transform: uppercase; color: #c9933a;
         }
         .about-title {
@@ -44,41 +45,38 @@ export default function About({ settings }) {
         .about-text {
           font-family: 'Cormorant Garamond', serif;
           font-weight: 300; font-size: 18px;
-          color: rgba(245,237,224,0.55); line-height: 1.8;
+          color: rgba(245,237,224,0.5); line-height: 1.8;
           margin-bottom: 20px; letter-spacing: 0.02em;
         }
         .about-divider {
           width: 48px; height: 1px;
-          background: rgba(201,147,58,0.3); margin: 32px 0;
+          background: rgba(201,147,58,0.35); margin: 32px 0;
         }
         .about-values {
-          display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+          display: grid; grid-template-columns: 1fr 1fr; gap: 26px 24px;
         }
-        .about-value {}
         .about-value-num {
           font-family: 'Cormorant Garamond', serif;
           font-weight: 300; font-size: 36px;
-          color: rgba(201,147,58,0.2); line-height: 1; margin-bottom: 8px;
+          color: rgba(201,147,58,0.22); line-height: 1; margin-bottom: 8px;
         }
         .about-value-title {
-          font-family: 'Barlow', sans-serif;
           font-size: 10px; font-weight: 500;
-          letter-spacing: 0.25em; text-transform: uppercase;
+          letter-spacing: 0.24em; text-transform: uppercase;
           color: #f5ede0; margin-bottom: 6px;
         }
         .about-value-text {
-          font-size: 12px; color: rgba(245,237,224,0.35);
+          font-size: 12px; color: rgba(245,237,224,0.32);
           line-height: 1.6; letter-spacing: 0.02em;
         }
         .about-right { position: relative; }
-        .about-img-wrap {
-          position: relative;
-        }
+        .about-img-wrap { position: relative; }
         .about-img-placeholder {
           width: 100%; aspect-ratio: 3/4;
           background: linear-gradient(135deg, #1a1208 0%, #0d0a06 100%);
           display: flex; align-items: center; justify-content: center;
           position: relative; overflow: hidden;
+          border: 1px solid rgba(201,147,58,0.08);
         }
         .about-img-placeholder::before {
           content: '';
@@ -88,12 +86,13 @@ export default function About({ settings }) {
         .about-img-text {
           font-family: 'Cormorant Garamond', serif;
           font-weight: 700; font-size: 120px;
-          color: rgba(201,147,58,0.06); letter-spacing: -0.04em;
+          color: rgba(201,147,58,0.07); letter-spacing: -0.04em;
           text-transform: uppercase; position: relative; z-index: 1;
         }
         .about-img-tag {
           position: absolute; bottom: -20px; left: -20px;
           background: #c9933a; padding: 20px 24px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
         .about-img-tag-num {
           font-family: 'Cormorant Garamond', serif;
@@ -101,12 +100,12 @@ export default function About({ settings }) {
           color: #0a0806; line-height: 1; margin-bottom: 4px;
         }
         .about-img-tag-text {
-          font-family: 'Barlow', sans-serif;
           font-size: 9px; font-weight: 500;
           letter-spacing: 0.2em; text-transform: uppercase; color: #0a0806;
         }
         @media (max-width: 900px) {
           .about-root { padding: 80px 24px; }
+          .about-top-line { left: 24px; right: 24px; }
           .about-inner { grid-template-columns: 1fr; gap: 48px; }
           .about-right { order: -1; }
           .about-values { grid-template-columns: 1fr 1fr; }
@@ -114,6 +113,7 @@ export default function About({ settings }) {
       `}</style>
 
       <section id="about" className="about-root">
+        <div className="about-top-line" />
         <div className="about-watermark">TB</div>
         <div className="about-inner">
           <div>

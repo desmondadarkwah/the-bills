@@ -106,15 +106,20 @@ export default function Contact({ settings }) {
         }
         .contact-wa-btn {
           width: 100%; padding: 17px;
-          background: #1DA851;
-          color: #fff; border: none; cursor: pointer;
+          background: transparent;
+          color: #c9933a;
+          border: 1px solid #c9933a;
+          cursor: pointer;
           font-family: 'Barlow', sans-serif;
           font-size: 9.5px; font-weight: 500;
           letter-spacing: 0.28em; text-transform: uppercase;
           display: flex; align-items: center; justify-content: center; gap: 10px;
-          transition: opacity 0.2s;
+          transition: all 0.25s;
         }
-        .contact-wa-btn:hover { opacity: 0.85; }
+        .contact-wa-btn:hover {
+          background: #c9933a;
+          color: #0a0806;
+        }
         .contact-wa-btn svg { width: 16px; height: 16px; }
         @media (max-width: 900px) {
           .contact-root { padding: 80px 24px; }
@@ -141,7 +146,7 @@ export default function Contact({ settings }) {
 
             <div className="contact-channels">
               
-               <a href={`https://wa.me/${settings?.whatsapp || '233546805804'}`}
+             <a href={`https://wa.me/${settings?.whatsapp || '233546805804'}`}
                 target="_blank" rel="noreferrer"
                 className="contact-channel"
               >
@@ -158,9 +163,10 @@ export default function Contact({ settings }) {
               </a>
 
               
-                <a href={settings?.instagram || 'https://instagram.com'}
+             <a href={settings?.instagram || 'https://instagram.com'}
                 target="_blank" rel="noreferrer"
-                className="contact-channel" >
+                className="contact-channel"
+              >
                 <div className="contact-channel-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="5"/>

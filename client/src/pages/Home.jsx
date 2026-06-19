@@ -6,6 +6,7 @@ import About from '../components/About'
 import Contact from '../components/Contact'
 import Footer from '../components/Footer'
 import { fetchSettings } from '../utils/api'
+import WhatsAppButton from '../components/WhatsAppButton'
 
 export default function Home() {
   const [settings, setSettings] = useState({})
@@ -22,6 +23,7 @@ export default function Home() {
       <About settings={settings} />
       <Contact settings={settings} />
       <Footer settings={settings} />
+      <WhatsAppButton />
     </div>
   )
 }

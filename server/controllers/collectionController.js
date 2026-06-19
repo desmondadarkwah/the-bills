@@ -24,8 +24,7 @@ export const getAllCollections = async (req, res) => {
 export const createCollection = async (req, res) => {
   try {
     const { name, description, active, order } = req.body
-    const image = req.file ? req.file.path : ''
-    const collection = await Collection.create({ name, description, image, active, order })
+    const collection = await Collection.create({ name, description, active, order })
     res.status(201).json({ success: true, data: collection })
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -38,10 +37,9 @@ export const updateCollection = async (req, res) => {
     const { name, description, active, order } = req.body
     const collection = await Collection.findById(req.params.id)
     if (!collection) return res.status(404).json({ error: 'Collection not found.' })
-    const image = req.file ? req.file.path : collection.image
     const updated = await Collection.findByIdAndUpdate(
       req.params.id,
-      { name, description, image, active, order },
+      { name, description, active, order },
       { new: true }
     )
     res.json({ success: true, data: updated })

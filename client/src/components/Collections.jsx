@@ -9,8 +9,21 @@ const WhatsAppIcon = () => (
 )
 
 const HeartIcon = ({ filled }) => (
-  <svg width="15" height="15" fill={filled ? '#c9933a' : 'none'} stroke="#c9933a" strokeWidth="1.5" viewBox="0 0 24 24">
+  <svg width="14" height="14" fill={filled ? '#c9933a' : 'none'} stroke="#c9933a" strokeWidth="1.5" viewBox="0 0 24 24">
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+)
+
+const CheckIcon = () => (
+  <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+)
+
+const CloseIcon = () => (
+  <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
   </svg>
 )
 
@@ -34,7 +47,7 @@ export default function Collections({ settings }) {
   }, [])
 
   const filters  = ['All', ...collections.map(c => c.name)]
-  const filtered = activeFilter === 'All' ? products : products.filter(p => p.category === activeFilter)
+  const filtered = activeFilter === 'All' ? products : products.filter(p => p.collection === activeFilter)
 
   const toggleWishlist = (id) => {
     const updated = wishlist.includes(id) ? wishlist.filter(w => w !== id) : [...wishlist, id]
@@ -50,13 +63,13 @@ export default function Collections({ settings }) {
 
   const handleWhatsApp = (product) => {
     const msg = `Hello The Bills!\n\nI'm interested in:\n\n*${product.name}*\nCategory: ${product.category}\nPrice: ${product.price}\n\nPlease provide more details. Thank you!`
-    window.open(`https://wa.me/${settings?.whatsapp || '233000000000'}?text=${encodeURIComponent(msg)}`, '_blank')
+    window.open(`https://wa.me/${settings?.whatsapp || '233546805804'}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   const handleBulkWhatsApp = (items) => {
     const list = items.map((p, i) => `${i + 1}. *${p.name}* — ${p.price}`).join('\n')
     const msg  = `Hello The Bills!\n\nI'm interested in the following pieces:\n\n${list}\n\nPlease provide more details. Thank you!`
-    window.open(`https://wa.me/${settings?.whatsapp || '233000000000'}?text=${encodeURIComponent(msg)}`, '_blank')
+    window.open(`https://wa.me/${settings?.whatsapp || '233546805804'}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   const handleBulkEnquire = () => {
@@ -72,11 +85,12 @@ export default function Collections({ settings }) {
           background: #0a0806;
           padding: 140px 56px 120px;
           position: relative;
+          font-family: 'Barlow', sans-serif;
         }
-        .col-root::before {
-          content: '';
+        .col-top-line {
           position: absolute; top: 0; left: 56px; right: 56px;
-          height: 1px; background: rgba(201,147,58,0.15);
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(201,147,58,0.22) 30%, rgba(201,147,58,0.22) 70%, transparent);
         }
 
         /* ── HEADER ── */
@@ -90,8 +104,8 @@ export default function Collections({ settings }) {
         }
         .col-eyebrow-line { width: 32px; height: 1px; background: #c9933a; }
         .col-eyebrow span {
-          font-family: 'Barlow', sans-serif; font-size: 10px;
-          letter-spacing: 0.35em; text-transform: uppercase; color: #c9933a;
+          font-size: 9.5px;
+          letter-spacing: 0.36em; text-transform: uppercase; color: #c9933a;
         }
         .col-title {
           font-family: 'Cormorant Garamond', serif;
@@ -112,10 +126,10 @@ export default function Collections({ settings }) {
           gap: 6px; flex-wrap: wrap;
         }
         .col-filter-btn {
-          font-family: 'Barlow', sans-serif; font-size: 9px;
-          letter-spacing: 0.22em; text-transform: uppercase;
-          padding: 8px 18px;
-          border: 1px solid rgba(201,147,58,0.18);
+          font-size: 9px;
+          letter-spacing: 0.2em; text-transform: uppercase;
+          padding: 9px 18px;
+          border: 1px solid rgba(201,147,58,0.16);
           background: transparent; color: rgba(245,237,224,0.35);
           cursor: pointer; transition: all 0.2s;
         }
@@ -127,19 +141,19 @@ export default function Collections({ settings }) {
           background: #c9933a; color: #0a0806; border-color: #c9933a;
         }
 
-        /* toolbar divider */
         .col-toolbar-sep {
           width: 1px; height: 18px;
           background: rgba(201,147,58,0.15); flex-shrink: 0;
         }
 
         .col-action-btn {
-          font-family: 'Barlow', sans-serif; font-size: 9px; font-weight: 500;
-          letter-spacing: 0.2em; text-transform: uppercase;
-          padding: 8px 16px; cursor: pointer; transition: all 0.2s;
+          font-size: 9px; font-weight: 500;
+          letter-spacing: 0.18em; text-transform: uppercase;
+          padding: 9px 16px; cursor: pointer; transition: all 0.2s;
           display: flex; align-items: center; gap: 7px; border: none;
           background: none; white-space: nowrap;
         }
+        .col-action-btn svg { flex-shrink: 0; }
         .col-action-btn-select {
           color: rgba(201,147,58,0.7);
           border: 1px solid rgba(201,147,58,0.2) !important;
@@ -175,7 +189,6 @@ export default function Collections({ settings }) {
           position: relative; overflow: hidden;
           background: #100e0a; cursor: pointer;
         }
-        /* selected outline */
         .col-card.selected::after {
           content: '';
           position: absolute; inset: 0;
@@ -183,14 +196,12 @@ export default function Collections({ settings }) {
           pointer-events: none; z-index: 3;
         }
 
-        /* image */
         .col-card-img {
           width: 100%; height: 440px; object-fit: cover; display: block;
           transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
         }
         .col-card:hover .col-card-img { transform: scale(1.06); }
 
-        /* placeholder */
         .col-card-placeholder {
           width: 100%; height: 440px;
           background: linear-gradient(160deg, #1a1208 0%, #0d0a06 100%);
@@ -212,7 +223,6 @@ export default function Collections({ settings }) {
           text-transform: uppercase; position: relative; z-index: 1;
         }
 
-        /* wishlist btn */
         .col-heart-btn {
           position: absolute; top: 14px; right: 14px; z-index: 4;
           width: 34px; height: 34px;
@@ -226,19 +236,16 @@ export default function Collections({ settings }) {
           background: rgba(10,8,6,0.9); border-color: rgba(201,147,58,0.6);
         }
 
-        /* select checkbox */
         .col-select-check {
           position: absolute; top: 14px; left: 14px; z-index: 4;
           width: 22px; height: 22px;
           background: rgba(10,8,6,0.65);
           border: 1px solid rgba(201,147,58,0.4);
           display: flex; align-items: center; justify-content: center;
-          cursor: pointer; transition: all 0.2s;
+          cursor: pointer; transition: all 0.2s; color: #0a0806;
         }
         .col-select-check.checked { background: #c9933a; border-color: #c9933a; }
-        .col-select-check span { font-size: 11px; color: #0a0806; font-weight: 700; }
 
-        /* always-visible info strip */
         .col-card-info {
           position: absolute; bottom: 0; left: 0; right: 0;
           padding: 32px 22px 18px;
@@ -246,7 +253,7 @@ export default function Collections({ settings }) {
           pointer-events: none;
         }
         .col-card-category {
-          font-family: 'Barlow', sans-serif; font-size: 9px;
+          font-size: 9px;
           letter-spacing: 0.3em; text-transform: uppercase;
           color: #c9933a; margin-bottom: 5px;
         }
@@ -257,11 +264,10 @@ export default function Collections({ settings }) {
           margin-bottom: 3px; text-transform: uppercase;
         }
         .col-card-price {
-          font-family: 'Barlow', sans-serif; font-size: 11px;
+          font-size: 11px;
           color: rgba(245,237,224,0.35); letter-spacing: 0.12em;
         }
 
-        /* hover overlay with action buttons */
         .col-card-overlay {
           position: absolute; inset: 0;
           display: flex; flex-direction: column; justify-content: flex-end;
@@ -272,7 +278,6 @@ export default function Collections({ settings }) {
         }
         .col-card:hover .col-card-overlay { opacity: 1; pointer-events: auto; }
 
-        /* on mobile — overlay always visible */
         @media (max-width: 768px) {
           .col-card-overlay { opacity: 1; pointer-events: auto; }
         }
@@ -280,18 +285,24 @@ export default function Collections({ settings }) {
         .col-card-actions { display: flex; gap: 6px; margin-top: 60px; }
         .col-card-btn {
           flex: 1; padding: 10px 8px;
-          font-family: 'Barlow', sans-serif; font-size: 9px; font-weight: 500;
+          font-size: 9px; font-weight: 500;
           letter-spacing: 0.2em; text-transform: uppercase;
           border: none; cursor: pointer;
           display: flex; align-items: center; justify-content: center; gap: 6px;
-          transition: opacity 0.2s;
+          transition: all 0.2s;
         }
-        .col-card-btn:hover { opacity: 0.82; }
-        .col-card-btn-wa  { background: #25D366; color: #fff; }
+        .col-card-btn-wa  {
+          background: transparent; color: #c9933a;
+          border: 1px solid #c9933a;
+        }
+        .col-card-btn-wa:hover {
+          background: #c9933a; color: #0a0806;
+        }
         .col-card-btn-dm  {
           background: rgba(201,147,58,0.1); color: #c9933a;
           border: 1px solid rgba(201,147,58,0.25);
         }
+        .col-card-btn-dm:hover { opacity: 0.82; }
 
         /* ── EMPTY STATE ── */
         .col-empty {
@@ -299,7 +310,7 @@ export default function Collections({ settings }) {
           padding: 100px 0; text-align: center;
         }
         .col-empty-eyebrow {
-          font-family: 'Barlow', sans-serif; font-size: 9px;
+          font-size: 9px;
           letter-spacing: 0.35em; text-transform: uppercase;
           color: rgba(201,147,58,0.3); margin-bottom: 16px;
         }
@@ -336,19 +347,27 @@ export default function Collections({ settings }) {
         .col-bulk-bar-text span { color: #c9933a; font-weight: 600; }
         .col-bulk-actions { display: flex; gap: 10px; }
         .col-bulk-btn {
-          font-family: 'Barlow', sans-serif; font-size: 9px; font-weight: 500;
+          font-size: 9px; font-weight: 500;
           letter-spacing: 0.22em; text-transform: uppercase;
           padding: 12px 28px; border: none; cursor: pointer;
-          transition: opacity 0.2s; white-space: nowrap;
+          transition: all 0.2s; white-space: nowrap;
         }
-        .col-bulk-btn:hover { opacity: 0.85; }
-        .col-bulk-btn-wa    { background: #25D366; color: #fff; display: flex; align-items: center; gap: 8px; }
-        .col-bulk-btn-clear { background: transparent; color: rgba(245,237,224,0.3); border: 1px solid rgba(245,237,224,0.08); }
+        .col-bulk-btn-wa {
+          background: transparent; color: #c9933a;
+          border: 1px solid #c9933a;
+          display: flex; align-items: center; gap: 8px;
+        }
+        .col-bulk-btn-wa:hover { background: #c9933a; color: #0a0806; }
+        .col-bulk-btn-clear {
+          background: transparent; color: rgba(245,237,224,0.3);
+          border: 1px solid rgba(245,237,224,0.08);
+        }
+        .col-bulk-btn-clear:hover { opacity: 0.85; }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 900px) {
           .col-root        { padding: 100px 24px 100px; }
-          .col-root::before{ left: 24px; right: 24px; }
+          .col-top-line    { left: 24px; right: 24px; }
           .col-grid        { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
           .col-card-img    { height: 360px; }
           .col-card-placeholder { height: 360px; }
@@ -364,6 +383,7 @@ export default function Collections({ settings }) {
       `}</style>
 
       <section id="collections" className="col-root">
+        <div className="col-top-line" />
 
         {/* Header */}
         <div className="col-header">
@@ -394,14 +414,14 @@ export default function Collections({ settings }) {
               className={`col-action-btn col-action-btn-select${selectMode ? ' active' : ''}`}
               onClick={() => { setSelectMode(!selectMode); setSelected([]) }}
             >
-              {selectMode ? '✕ Cancel' : '☑ Select'}
+              {selectMode ? <><CloseIcon /> Cancel</> : <><CheckIcon /> Select</>}
             </button>
 
             <button
               className="col-action-btn col-action-btn-wishlist"
               onClick={() => navigate('/wishlist')}
             >
-              ♡ Saved{wishlist.length > 0 ? ` (${wishlist.length})` : ''}
+              <HeartIcon filled={false} /> Saved{wishlist.length > 0 ? ` (${wishlist.length})` : ''}
             </button>
           </div>
         </div>
@@ -434,7 +454,6 @@ export default function Collections({ settings }) {
                   className={`col-card${selected.includes(product._id) ? ' selected' : ''}`}
                   onClick={() => selectMode && toggleSelect(product._id)}
                 >
-                  {/* Wishlist */}
                   <button
                     className="col-heart-btn"
                     onClick={e => { e.stopPropagation(); toggleWishlist(product._id) }}
@@ -442,14 +461,12 @@ export default function Collections({ settings }) {
                     <HeartIcon filled={wishlist.includes(product._id)} />
                   </button>
 
-                  {/* Select checkbox */}
                   {selectMode && (
                     <div className={`col-select-check${selected.includes(product._id) ? ' checked' : ''}`}>
-                      {selected.includes(product._id) && <span>✓</span>}
+                      {selected.includes(product._id) && <CheckIcon />}
                     </div>
                   )}
 
-                  {/* Image */}
                   {product.images?.[0] ? (
                     <img src={product.images[0]} alt={product.name} className="col-card-img" />
                   ) : (
@@ -458,14 +475,12 @@ export default function Collections({ settings }) {
                     </div>
                   )}
 
-                  {/* Always-visible info */}
                   <div className="col-card-info">
                     <div className="col-card-category">{product.category}</div>
                     <div className="col-card-name">{product.name}</div>
                     <div className="col-card-price">{product.price}</div>
                   </div>
 
-                  {/* Hover overlay */}
                   {!selectMode && (
                     <div className="col-card-overlay">
                       <div className="col-card-actions">

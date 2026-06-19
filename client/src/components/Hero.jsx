@@ -168,7 +168,7 @@ export default function Hero({ settings }) {
         <div className="hero-watermark">TB</div>
 
         <div className="hero-corner">
-          <div className="hero-corner-num">Est. 2024</div>
+          <div className="hero-corner-num">Est. 2026</div>
           <div className="hero-corner-num" style={{ marginTop:4 }}>Accra, Ghana</div>
         </div>
 

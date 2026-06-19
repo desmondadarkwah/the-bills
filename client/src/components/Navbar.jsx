@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import logo from '../assets/billLogo.png'
 
 export default function Navbar({ settings }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -28,7 +29,6 @@ export default function Navbar({ settings }) {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
         }
 
-        /* thin gold line at very top */
         .nav-topline {
           height: 1px;
           background: linear-gradient(to right, transparent, #c9933a 40%, rgba(201,147,58,0.3) 100%);
@@ -36,7 +36,7 @@ export default function Navbar({ settings }) {
 
         .nav-bar {
           display: flex; align-items: center; justify-content: space-between;
-          padding: 26px 56px;
+          padding: 22px 56px;
           background: rgba(10,8,6,0);
           border-bottom: 1px solid rgba(201,147,58,0);
           backdrop-filter: blur(0px);
@@ -44,7 +44,7 @@ export default function Navbar({ settings }) {
                       border-color 0.4s ease, backdrop-filter 0.4s ease;
         }
         .nav-bar.scrolled {
-          padding: 16px 56px;
+          padding: 14px 56px;
           background: rgba(10,8,6,0.94);
           border-bottom-color: rgba(201,147,58,0.1);
           backdrop-filter: blur(16px);
@@ -53,22 +53,27 @@ export default function Navbar({ settings }) {
         /* ── LOGO ── */
         .nav-logo {
           font-family: 'Cormorant Garamond', serif;
-          font-weight: 600; font-size: 20px;
-          letter-spacing: 0.22em; text-transform: uppercase;
+          font-weight: 600; font-size: 19px;
+          letter-spacing: 0.2em; text-transform: uppercase;
           color: #f5ede0; text-decoration: none;
           display: flex; align-items: center; gap: 12px;
           position: relative; z-index: 2;
         }
-        .nav-logo-ornament {
-          display: flex; flex-direction: column; align-items: center; gap: 3px;
+        .nav-logo-mark {
+          width: 38px; height: 38px;
+          flex-shrink: 0;
+          display: flex; align-items: center; justify-content: center;
+          border: 1px solid rgba(201,147,58,0.3);
+          overflow: hidden;
+          transition: border-color 0.3s;
         }
-        .nav-logo-ornament-line {
-          width: 18px; height: 1px; background: #c9933a; opacity: 0.7;
+        .nav-logo:hover .nav-logo-mark {
+          border-color: rgba(201,147,58,0.6);
         }
-        .nav-logo-dot {
-          width: 5px; height: 5px;
-          background: #c9933a; border-radius: 50%;
-          box-shadow: 0 0 6px rgba(201,147,58,0.5);
+        .nav-logo-mark img {
+          width: 100%; height: 100%;
+          object-fit: contain;
+          display: block;
         }
 
         /* ── DESKTOP NAV ── */
@@ -88,7 +93,6 @@ export default function Navbar({ settings }) {
           transition: color 0.25s;
           position: relative; padding-bottom: 4px;
         }
-        /* underline sweeps in from center */
         .nav-links a::before {
           content: '';
           position: absolute; bottom: 0; left: 50%; right: 50%;
@@ -98,7 +102,6 @@ export default function Navbar({ settings }) {
         .nav-links a:hover { color: #f5ede0; }
         .nav-links a:hover::before { left: 0; right: 0; }
 
-        /* divider between links and CTA */
         .nav-divider {
           width: 1px; height: 18px;
           background: rgba(201,147,58,0.2);
@@ -112,19 +115,13 @@ export default function Navbar({ settings }) {
           color: #0a0806;
           background: #c9933a;
           border: none; padding: 11px 28px;
-          cursor: pointer; transition: opacity 0.2s, box-shadow 0.2s;
+          cursor: pointer; transition: opacity 0.2s, box-shadow 0.3s;
           text-decoration: none; display: inline-block;
           position: relative;
         }
-        .nav-enquire::after {
-          content: '';
-          position: absolute; inset: 0;
-          box-shadow: 0 0 0 0 rgba(201,147,58,0.4);
-          transition: box-shadow 0.3s;
-        }
-        .nav-enquire:hover { opacity: 0.88; }
-        .nav-enquire:hover::after {
-          box-shadow: 0 0 18px 2px rgba(201,147,58,0.2);
+        .nav-enquire:hover {
+          opacity: 0.92;
+          box-shadow: 0 0 18px 1px rgba(201,147,58,0.3);
         }
 
         /* ── HAMBURGER ── */
@@ -143,7 +140,6 @@ export default function Navbar({ settings }) {
         .nav-hamburger span:nth-child(1) { width: 26px; }
         .nav-hamburger span:nth-child(2) { width: 18px; }
         .nav-hamburger span:nth-child(3) { width: 22px; }
-        /* animate to X when open */
         .nav-hamburger.open span:nth-child(1) { width: 24px; transform: translateY(6px) rotate(45deg); }
         .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
         .nav-hamburger.open span:nth-child(3) { width: 24px; transform: translateY(-6px) rotate(-45deg); }
@@ -160,7 +156,6 @@ export default function Navbar({ settings }) {
         }
         .nav-mobile.open { transform: translateX(0); }
 
-        /* texture overlay */
         .nav-mobile::before {
           content: '';
           position: absolute; inset: 0;
@@ -170,7 +165,6 @@ export default function Navbar({ settings }) {
           );
           pointer-events: none;
         }
-        /* gold left edge */
         .nav-mobile::after {
           content: '';
           position: absolute; top: 0; left: 0;
@@ -178,7 +172,6 @@ export default function Navbar({ settings }) {
           background: linear-gradient(to bottom, transparent, #c9933a 40%, transparent);
         }
 
-        /* watermark */
         .nav-mobile-watermark {
           position: absolute; bottom: -60px; right: -30px;
           font-family: 'Cormorant Garamond', serif;
@@ -188,7 +181,6 @@ export default function Navbar({ settings }) {
           line-height: 1;
         }
 
-        /* links */
         .nav-mobile-links {
           display: flex; flex-direction: column;
           align-items: center; gap: 0;
@@ -214,7 +206,6 @@ export default function Navbar({ settings }) {
         .nav-mobile a:hover { color: #f5ede0; }
         .nav-mobile a:hover::after { left: 32px; right: 32px; }
 
-        /* separator before CTA */
         .nav-mobile-sep {
           width: 40px; height: 1px;
           background: rgba(201,147,58,0.3);
@@ -222,14 +213,12 @@ export default function Navbar({ settings }) {
           position: relative; z-index: 2;
         }
 
-        /* CTA in mobile menu */
         .nav-mobile .nav-enquire {
           position: relative; z-index: 2;
           font-size: 10px; padding: 14px 52px;
           letter-spacing: 0.3em;
         }
 
-        /* meta info at bottom */
         .nav-mobile-meta {
           position: absolute; bottom: 36px;
           left: 0; right: 0;
@@ -244,8 +233,8 @@ export default function Navbar({ settings }) {
 
         /* ── RESPONSIVE ── */
         @media (max-width: 900px) {
-          .nav-bar         { padding: 20px 28px; }
-          .nav-bar.scrolled{ padding: 14px 28px; }
+          .nav-bar         { padding: 18px 28px; }
+          .nav-bar.scrolled{ padding: 13px 28px; }
           .nav-desktop     { display: none; }
           .nav-hamburger   { display: flex; }
         }
@@ -258,10 +247,8 @@ export default function Navbar({ settings }) {
 
           {/* Logo */}
           <a href="/" className="nav-logo">
-            <div className="nav-logo-ornament">
-              <div className="nav-logo-ornament-line" />
-              <div className="nav-logo-dot" />
-              <div className="nav-logo-ornament-line" />
+            <div className="nav-logo-mark">
+              <img src={logo} alt={settings?.brandName || 'The Bills'} />
             </div>
             {settings?.brandName || 'The Bills'}
           </a>
@@ -296,8 +283,8 @@ export default function Navbar({ settings }) {
 
         <div className="nav-mobile-links">
           {links.map(link => (
-            <a
-              key={link}
+            
+            <a  key={link}
               href={`#${link.toLowerCase()}`}
               onClick={() => setMenuOpen(false)}
             >
@@ -308,8 +295,8 @@ export default function Navbar({ settings }) {
 
         <div className="nav-mobile-sep" />
 
-        <a
-          href="#contact"
+        
+         <a href="#contact"
           className="nav-enquire"
           onClick={() => setMenuOpen(false)}
         >
