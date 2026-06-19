@@ -13,7 +13,7 @@ function ProtectedRoute({ children }) {
   }
 
   if (!admin) {
-    return <Navigate to="/the-bills-manage/login" replace />
+    return <Navigate to="/manage/login" replace />
   }
 
   return children

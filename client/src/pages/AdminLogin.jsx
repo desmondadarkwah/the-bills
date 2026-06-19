@@ -17,7 +17,7 @@ export default function AdminLogin() {
     setLoading(true); setError('')
     try {
       const data = await loginAdmin({ email, password })
-      if (data.success) { login(data.token, data.admin); navigate('/the-bills-manage') }
+      if (data.success) { login(data.token, data.admin); navigate('/manage') }
       else setError(data.error || 'Login failed.')
     } catch (err) {
       setError(err.response?.data?.error || 'Server error. Make sure backend is running.')

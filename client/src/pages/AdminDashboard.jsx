@@ -110,7 +110,7 @@ export default function AdminDashboard() {
   const { admin, logout } = useAuth()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('overview')
-  const handleLogout = () => { logout(); navigate('/the-bills-manage/login') }
+  const handleLogout = () => { logout(); navigate('/manage/login') }
 
   const tabs = [
     { id: 'overview',     label: 'Overview',    icon: '📊', group: 'main' },

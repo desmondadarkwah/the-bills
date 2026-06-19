@@ -17,7 +17,7 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('bills_token')
-      window.location.href = '/the-bills-manage/login'
+      window.location.href = '/manage/login'
     }
     return Promise.reject(error)
   }

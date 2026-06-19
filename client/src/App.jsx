@@ -11,8 +11,8 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/wishlist" element={<Wishlist />} />
-      <Route path="/the-bills-manage/login" element={<AdminLogin />} />
-      <Route path="/the-bills-manage" element={
+      <Route path="/manage/login" element={<AdminLogin />} />
+      <Route path="/manage" element={
         <ProtectedRoute>
           <AdminDashboard />
         </ProtectedRoute>
