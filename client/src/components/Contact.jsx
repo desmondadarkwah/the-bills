@@ -176,7 +176,7 @@ export default function Contact({ settings }) {
                 </div>
                 <div>
                   <div className="contact-channel-label">Instagram</div>
-                  <div className="contact-channel-value">@thebills</div>
+                  <div className="contact-channel-value">@Bills</div>
                 </div>
                 <div className="contact-channel-arrow">→</div>
               </a>
