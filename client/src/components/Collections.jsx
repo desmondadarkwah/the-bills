@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { fetchProducts, fetchCollections } from '../utils/api'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-motion'
 
 const WhatsAppIcon = () => (
   <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
@@ -305,14 +305,12 @@ export default function Collections({ settings }) {
           display: flex; align-items: center; justify-content: center; gap: 6px;
           transition: all 0.2s;
         }
-        .col-card-btn-wa  {
+        .col-card-btn-wa {
           background: transparent; color: #c9933a;
           border: 1px solid #c9933a;
         }
-        .col-card-btn-wa:hover {
-          background: #c9933a; color: #0a0806;
-        }
-        .col-card-btn-dm  {
+        .col-card-btn-wa:hover { background: #c9933a; color: #0a0806; }
+        .col-card-btn-dm {
           background: rgba(201,147,58,0.1); color: #c9933a;
           border: 1px solid rgba(201,147,58,0.25);
         }
@@ -397,6 +395,7 @@ export default function Collections({ settings }) {
           grid-template-columns: 1.1fr 1fr;
           overflow: hidden;
           animation: colSlideUp 0.35s cubic-bezier(0.16,1,0.3,1);
+          position: relative;
         }
         @keyframes colSlideUp {
           from { opacity: 0; transform: translateY(24px) scale(0.98); }
@@ -404,9 +403,9 @@ export default function Collections({ settings }) {
         }
 
         .col-view-close {
-          position: absolute; top: 20px; right: 20px; z-index: 5;
+          position: absolute; top: 16px; right: 16px; z-index: 10;
           width: 38px; height: 38px;
-          background: rgba(10,8,6,0.7);
+          background: rgba(10,8,6,0.85);
           border: 1px solid rgba(201,147,58,0.3);
           color: #f5ede0;
           display: flex; align-items: center; justify-content: center;
@@ -419,6 +418,7 @@ export default function Collections({ settings }) {
           position: relative;
           background: #100e0a;
           display: flex; flex-direction: column;
+          overflow: hidden;
         }
         .col-view-img-main {
           width: 100%; flex: 1;
@@ -439,6 +439,7 @@ export default function Collections({ settings }) {
           display: flex; gap: 6px; padding: 12px;
           background: #0a0806;
           overflow-x: auto;
+          flex-shrink: 0;
         }
         .col-view-thumb {
           width: 56px; height: 56px; flex-shrink: 0;
@@ -453,6 +454,7 @@ export default function Collections({ settings }) {
           padding: 40px 36px;
           display: flex; flex-direction: column;
           overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
         }
         .col-view-category {
           font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
@@ -471,7 +473,7 @@ export default function Collections({ settings }) {
         }
         .col-view-divider {
           width: 36px; height: 1px; background: rgba(201,147,58,0.3);
-          margin-bottom: 24px;
+          margin-bottom: 24px; flex-shrink: 0;
         }
         .col-view-label {
           font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
@@ -483,12 +485,23 @@ export default function Collections({ settings }) {
           color: rgba(245,237,224,0.55);
           margin-bottom: 24px;
         }
+        .col-view-enquire {
+          width: 100%; padding: 14px;
+          background: transparent; color: #c9933a;
+          border: 1px solid #c9933a; cursor: pointer;
+          font-family: 'Barlow', sans-serif;
+          font-size: 9px; font-weight: 500;
+          letter-spacing: 0.22em; text-transform: uppercase;
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          transition: all 0.2s; flex-shrink: 0; margin-bottom: 20px;
+        }
+        .col-view-enquire:hover { background: #c9933a; color: #0a0806; }
         .col-view-meta {
           display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
-          margin-top: auto; padding-top: 20px;
+          padding-top: 20px;
           border-top: 1px solid rgba(201,147,58,0.1);
+          flex-shrink: 0;
         }
-        .col-view-meta-item {}
         .col-view-meta-label {
           font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
           color: rgba(245,237,224,0.25); margin-bottom: 4px;
@@ -498,19 +511,7 @@ export default function Collections({ settings }) {
           font-size: 15px; color: rgba(245,237,224,0.75);
         }
 
-        @media (max-width: 768px) {
-          .col-view-backdrop { padding: 0; align-items: flex-end; }
-          .col-view-modal {
-            grid-template-columns: 1fr;
-            max-height: 92vh; max-width: 100%;
-            width: 100%;
-          }
-          .col-view-img-main { max-height: 360px; min-height: 280px; }
-          .col-view-body { padding: 28px 24px 32px; }
-          .col-view-name { font-size: 26px; }
-        }
-
-        /* ── RESPONSIVE GRID ── */
+        /* ── RESPONSIVE ── */
         @media (max-width: 900px) {
           .col-root        { padding: 100px 24px 100px; }
           .col-top-line    { left: 24px; right: 24px; }
@@ -523,15 +524,66 @@ export default function Collections({ settings }) {
           .col-bulk-actions{ width: 100%; }
           .col-bulk-btn    { flex: 1; text-align: center; justify-content: center; }
         }
+
+        /* ── MOBILE MODAL FIXES ── */
+        @media (max-width: 768px) {
+          .col-view-backdrop {
+            padding: 0;
+            align-items: flex-end;
+          }
+          .col-view-modal {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+            max-height: 95vh;
+            max-width: 100%;
+            width: 100%;
+            border-left: none;
+            border-right: none;
+            border-bottom: none;
+            border-radius: 0;
+          }
+          /* image section — fixed height so body gets the rest */
+          .col-view-imgwrap {
+            max-height: 42vh;
+            flex-shrink: 0;
+          }
+          .col-view-img-main {
+            min-height: 0;
+            max-height: 36vh;
+            height: 36vh;
+          }
+          .col-view-img-placeholder {
+            min-height: 0;
+            height: 36vh;
+          }
+          /* body section scrolls freely */
+          .col-view-body {
+            padding: 24px 20px 36px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            flex: 1;
+          }
+          .col-view-name { font-size: 24px; }
+          .col-view-price { font-size: 18px; margin-bottom: 18px; }
+          .col-view-desc { font-size: 13px; margin-bottom: 18px; }
+          /* enquire button always visible on mobile */
+          .col-view-enquire { margin-bottom: 18px; }
+          .col-view-meta { gap: 12px; }
+          .col-view-meta-value { font-size: 13.5px; }
+        }
+
         @media (max-width: 480px) {
           .col-grid { grid-template-columns: 1fr; }
+          .col-view-img-main { height: 30vh; max-height: 30vh; }
+          .col-view-img-placeholder { height: 30vh; }
+          .col-view-body { padding: 20px 16px 32px; }
+          .col-view-name { font-size: 22px; }
         }
       `}</style>
 
       <section id="collections" className="col-root">
         <div className="col-top-line" />
 
-        {/* Header */}
         <div className="col-header">
           <div>
             <div className="col-eyebrow">
@@ -553,16 +605,13 @@ export default function Collections({ settings }) {
                 </button>
               ))}
             </div>
-
             <div className="col-toolbar-sep" />
-
             <button
               className={`col-action-btn col-action-btn-select${selectMode ? ' active' : ''}`}
               onClick={() => { setSelectMode(!selectMode); setSelected([]) }}
             >
               {selectMode ? <><CloseIcon /> Cancel</> : <><CheckIcon /> Select</>}
             </button>
-
             <button
               className="col-action-btn col-action-btn-wishlist"
               onClick={() => navigate('/wishlist')}
@@ -572,18 +621,10 @@ export default function Collections({ settings }) {
           </div>
         </div>
 
-        {/* Grid */}
         {loading ? (
           <div className="col-grid">
             {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  height: 440,
-                  background: 'linear-gradient(160deg,#1a1208,#0d0a06)',
-                  opacity: 0.4 + i * 0.04,
-                }}
-              />
+              <div key={i} style={{ height: 440, background: 'linear-gradient(160deg,#1a1208,#0d0a06)', opacity: 0.4 + i * 0.04 }} />
             ))}
           </div>
         ) : (
@@ -600,10 +641,7 @@ export default function Collections({ settings }) {
                   className={`col-card${selected.includes(product._id) ? ' selected' : ''}`}
                   onClick={() => selectMode ? toggleSelect(product._id) : openView(product)}
                 >
-                  <button
-                    className="col-heart-btn"
-                    onClick={e => { e.stopPropagation(); toggleWishlist(product._id) }}
-                  >
+                  <button className="col-heart-btn" onClick={e => { e.stopPropagation(); toggleWishlist(product._id) }}>
                     <HeartIcon filled={wishlist.includes(product._id)} />
                   </button>
 
@@ -630,16 +668,10 @@ export default function Collections({ settings }) {
                   {!selectMode && (
                     <div className="col-card-overlay">
                       <div className="col-card-actions">
-                        <button
-                          className="col-card-btn col-card-btn-wa"
-                          onClick={e => { e.stopPropagation(); handleWhatsApp(product) }}
-                        >
+                        <button className="col-card-btn col-card-btn-wa" onClick={e => { e.stopPropagation(); handleWhatsApp(product) }}>
                           <WhatsAppIcon /> WhatsApp
                         </button>
-                        <button
-                          className="col-card-btn col-card-btn-dm"
-                          onClick={e => { e.stopPropagation(); window.open(settings?.instagram || '#', '_blank') }}
-                        >
+                        <button className="col-card-btn col-card-btn-dm" onClick={e => { e.stopPropagation(); window.open(settings?.instagram || '#', '_blank') }}>
                           DM Us
                         </button>
                       </div>
@@ -652,7 +684,6 @@ export default function Collections({ settings }) {
         )}
       </section>
 
-      {/* Bulk action bar */}
       <div className={`col-bulk-bar${selected.length > 0 ? ' visible' : ''}`}>
         <div className="col-bulk-bar-left">
           <div className="col-bulk-bar-dot" />
@@ -668,7 +699,6 @@ export default function Collections({ settings }) {
         </div>
       </div>
 
-      {/* View product modal */}
       {viewProduct && (
         <div className="col-view-backdrop" onClick={e => e.target === e.currentTarget && closeView()}>
           <div className="col-view-modal">
@@ -683,13 +713,7 @@ export default function Collections({ settings }) {
               {viewProduct.images?.length > 1 && (
                 <div className="col-view-thumbs">
                   {viewProduct.images.map((img, i) => (
-                    <img
-                      key={i}
-                      src={img}
-                      alt=""
-                      className={`col-view-thumb${i === activeImg ? ' active' : ''}`}
-                      onClick={() => setActiveImg(i)}
-                    />
+                    <img key={i} src={img} alt="" className={`col-view-thumb${i === activeImg ? ' active' : ''}`} onClick={() => setActiveImg(i)} />
                   ))}
                 </div>
               )}
@@ -702,7 +726,9 @@ export default function Collections({ settings }) {
               <div className="col-view-divider" />
               <div className="col-view-label">Description</div>
               <p className="col-view-desc">{viewProduct.description || 'No description provided.'}</p>
-
+              <button className="col-view-enquire" onClick={() => handleWhatsApp(viewProduct)}>
+                <WhatsAppIcon /> Enquire on This Piece
+              </button>
               <div className="col-view-meta">
                 <div className="col-view-meta-item">
                   <div className="col-view-meta-label">Category</div>
