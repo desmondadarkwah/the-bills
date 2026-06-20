@@ -73,14 +73,11 @@ export default function About({ settings }) {
         }
         .about-right { position: relative; }
         .about-img-wrap { position: relative; }
-
-        /* ── THE ATMOSPHERIC IMAGE SLOT ── */
         .about-img-placeholder {
           width: 100%; aspect-ratio: 3/4;
           background: linear-gradient(135deg, #1a1208 0%, #0d0a06 100%);
           display: flex; align-items: center; justify-content: center;
           position: relative; overflow: hidden;
-          border: 1px solid rgba(201,147,58,0.08);
         }
         .about-img-placeholder::before {
           content: '';
@@ -90,8 +87,6 @@ export default function About({ settings }) {
             rgba(201,147,58,0.02) 20px, rgba(201,147,58,0.02) 21px
           );
         }
-
-        /* logo image — same ghosted feel as the old TB text */
         .about-img-logo {
           width: 62%;
           object-fit: contain;
@@ -100,7 +95,6 @@ export default function About({ settings }) {
           user-select: none; pointer-events: none;
           filter: brightness(3) sepia(1) saturate(2) hue-rotate(5deg);
         }
-
         .about-img-tag {
           position: absolute; bottom: -20px; left: -20px;
           background: #c9933a; padding: 20px 24px;
