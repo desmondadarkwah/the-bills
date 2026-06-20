@@ -107,10 +107,10 @@ export default function About({ settings }) {
         .about-img-logo {
           width: 62%;
           object-fit: contain;
-          opacity: 0.07;
+          opacity: 1;
           position: relative; z-index: 1;
           user-select: none; pointer-events: none;
-          filter: brightness(3) sepia(1) saturate(2) hue-rotate(5deg);
+          filter: none;
         }
         .about-img-tag {
           position: absolute; bottom: -20px; left: -20px;
