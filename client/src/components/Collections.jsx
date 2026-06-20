@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { fetchProducts, fetchCollections } from '../utils/api'
-import { useNavigate } from 'react-router-motion'
+import { useNavigate } from 'react-router-dom'
 
 const WhatsAppIcon = () => (
   <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
