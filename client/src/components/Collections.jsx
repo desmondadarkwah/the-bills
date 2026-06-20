@@ -35,6 +35,8 @@ export default function Collections({ settings }) {
   const [selected, setSelected]         = useState([])
   const [wishlist, setWishlist]         = useState([])
   const [selectMode, setSelectMode]     = useState(false)
+  const [viewProduct, setViewProduct]   = useState(null)
+  const [activeImg, setActiveImg]       = useState(0)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -45,6 +47,11 @@ export default function Collections({ settings }) {
     const saved = localStorage.getItem('bills_wishlist')
     if (saved) setWishlist(JSON.parse(saved))
   }, [])
+
+  useEffect(() => {
+    document.body.style.overflow = viewProduct ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [viewProduct])
 
   const filters  = ['All', ...collections.map(c => c.name)]
   const filtered = activeFilter === 'All' ? products : products.filter(p => p.collection === activeFilter)
@@ -76,6 +83,13 @@ export default function Collections({ settings }) {
     const items = products.filter(p => selected.includes(p._id))
     handleBulkWhatsApp(items)
   }
+
+  const openView = (product) => {
+    setViewProduct(product)
+    setActiveImg(0)
+  }
+
+  const closeView = () => setViewProduct(null)
 
   return (
     <>
@@ -364,7 +378,139 @@ export default function Collections({ settings }) {
         }
         .col-bulk-btn-clear:hover { opacity: 0.85; }
 
-        /* ── RESPONSIVE ── */
+        /* ── VIEW MODAL ── */
+        .col-view-backdrop {
+          position: fixed; inset: 0; z-index: 200;
+          background: rgba(5,4,3,0.92);
+          backdrop-filter: blur(8px);
+          display: flex; align-items: center; justify-content: center;
+          padding: 32px;
+          animation: colFadeIn 0.25s ease;
+        }
+        @keyframes colFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .col-view-modal {
+          width: 100%; max-width: 980px; max-height: 88vh;
+          background: #0d0a06;
+          border: 1px solid rgba(201,147,58,0.18);
+          display: grid;
+          grid-template-columns: 1.1fr 1fr;
+          overflow: hidden;
+          animation: colSlideUp 0.35s cubic-bezier(0.16,1,0.3,1);
+        }
+        @keyframes colSlideUp {
+          from { opacity: 0; transform: translateY(24px) scale(0.98); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .col-view-close {
+          position: absolute; top: 20px; right: 20px; z-index: 5;
+          width: 38px; height: 38px;
+          background: rgba(10,8,6,0.7);
+          border: 1px solid rgba(201,147,58,0.3);
+          color: #f5ede0;
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer; transition: all 0.2s;
+          backdrop-filter: blur(4px);
+        }
+        .col-view-close:hover { border-color: #c9933a; background: rgba(10,8,6,0.95); }
+
+        .col-view-imgwrap {
+          position: relative;
+          background: #100e0a;
+          display: flex; flex-direction: column;
+        }
+        .col-view-img-main {
+          width: 100%; flex: 1;
+          object-fit: cover; display: block;
+          min-height: 320px; max-height: 560px;
+        }
+        .col-view-img-placeholder {
+          width: 100%; flex: 1; min-height: 320px;
+          background: linear-gradient(160deg, #1a1208 0%, #0d0a06 100%);
+          display: flex; align-items: center; justify-content: center;
+        }
+        .col-view-img-placeholder span {
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 700; font-size: 90px;
+          color: rgba(201,147,58,0.08); letter-spacing: -0.04em;
+        }
+        .col-view-thumbs {
+          display: flex; gap: 6px; padding: 12px;
+          background: #0a0806;
+          overflow-x: auto;
+        }
+        .col-view-thumb {
+          width: 56px; height: 56px; flex-shrink: 0;
+          object-fit: cover; cursor: pointer;
+          opacity: 0.45; transition: opacity 0.2s, border-color 0.2s;
+          border: 1px solid transparent;
+        }
+        .col-view-thumb:hover { opacity: 0.8; }
+        .col-view-thumb.active { opacity: 1; border-color: #c9933a; }
+
+        .col-view-body {
+          padding: 40px 36px;
+          display: flex; flex-direction: column;
+          overflow-y: auto;
+        }
+        .col-view-category {
+          font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
+          color: #c9933a; margin-bottom: 14px;
+        }
+        .col-view-name {
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 500; font-size: 32px;
+          color: #f5ede0; text-transform: uppercase;
+          letter-spacing: 0.02em; line-height: 1.1; margin-bottom: 14px;
+        }
+        .col-view-price {
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 400; font-size: 22px;
+          color: #c9933a; margin-bottom: 24px;
+        }
+        .col-view-divider {
+          width: 36px; height: 1px; background: rgba(201,147,58,0.3);
+          margin-bottom: 24px;
+        }
+        .col-view-label {
+          font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
+          color: rgba(245,237,224,0.3); margin-bottom: 8px;
+        }
+        .col-view-desc {
+          font-family: 'Barlow', sans-serif;
+          font-size: 13.5px; line-height: 1.8;
+          color: rgba(245,237,224,0.55);
+          margin-bottom: 24px;
+        }
+        .col-view-meta {
+          display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+          margin-top: auto; padding-top: 20px;
+          border-top: 1px solid rgba(201,147,58,0.1);
+        }
+        .col-view-meta-item {}
+        .col-view-meta-label {
+          font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
+          color: rgba(245,237,224,0.25); margin-bottom: 4px;
+        }
+        .col-view-meta-value {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 15px; color: rgba(245,237,224,0.75);
+        }
+
+        @media (max-width: 768px) {
+          .col-view-backdrop { padding: 0; align-items: flex-end; }
+          .col-view-modal {
+            grid-template-columns: 1fr;
+            max-height: 92vh; max-width: 100%;
+            width: 100%;
+          }
+          .col-view-img-main { max-height: 360px; min-height: 280px; }
+          .col-view-body { padding: 28px 24px 32px; }
+          .col-view-name { font-size: 26px; }
+        }
+
+        /* ── RESPONSIVE GRID ── */
         @media (max-width: 900px) {
           .col-root        { padding: 100px 24px 100px; }
           .col-top-line    { left: 24px; right: 24px; }
@@ -452,7 +598,7 @@ export default function Collections({ settings }) {
                 <div
                   key={product._id}
                   className={`col-card${selected.includes(product._id) ? ' selected' : ''}`}
-                  onClick={() => selectMode && toggleSelect(product._id)}
+                  onClick={() => selectMode ? toggleSelect(product._id) : openView(product)}
                 >
                   <button
                     className="col-heart-btn"
@@ -521,6 +667,56 @@ export default function Collections({ settings }) {
           </button>
         </div>
       </div>
+
+      {/* View product modal */}
+      {viewProduct && (
+        <div className="col-view-backdrop" onClick={e => e.target === e.currentTarget && closeView()}>
+          <div className="col-view-modal">
+            <button className="col-view-close" onClick={closeView}><CloseIcon /></button>
+
+            <div className="col-view-imgwrap">
+              {viewProduct.images?.[activeImg] ? (
+                <img src={viewProduct.images[activeImg]} alt={viewProduct.name} className="col-view-img-main" />
+              ) : (
+                <div className="col-view-img-placeholder"><span>TB</span></div>
+              )}
+              {viewProduct.images?.length > 1 && (
+                <div className="col-view-thumbs">
+                  {viewProduct.images.map((img, i) => (
+                    <img
+                      key={i}
+                      src={img}
+                      alt=""
+                      className={`col-view-thumb${i === activeImg ? ' active' : ''}`}
+                      onClick={() => setActiveImg(i)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="col-view-body">
+              <div className="col-view-category">{viewProduct.category}</div>
+              <div className="col-view-name">{viewProduct.name}</div>
+              <div className="col-view-price">{viewProduct.price}</div>
+              <div className="col-view-divider" />
+              <div className="col-view-label">Description</div>
+              <p className="col-view-desc">{viewProduct.description || 'No description provided.'}</p>
+
+              <div className="col-view-meta">
+                <div className="col-view-meta-item">
+                  <div className="col-view-meta-label">Category</div>
+                  <div className="col-view-meta-value">{viewProduct.category || '—'}</div>
+                </div>
+                <div className="col-view-meta-item">
+                  <div className="col-view-meta-label">Collection</div>
+                  <div className="col-view-meta-value">{viewProduct.collection || '—'}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
