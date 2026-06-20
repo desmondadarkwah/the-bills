@@ -179,7 +179,7 @@ export default function Footer({ settings }) {
               <div className="footer-brand-row">
                 <img src={logo} alt={settings?.brandName || 'The Bills'} className="footer-logo-img" />
                 <div className="footer-wordmark">
-                  {settings?.shortName || 'TB'}
+                  {settings?.shortName || 'thebills'}
                 </div>
               </div>
 
