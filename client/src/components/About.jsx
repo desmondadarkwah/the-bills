@@ -27,7 +27,11 @@ export default function About({ settings }) {
         .about-inner {
           max-width: 1200px; margin: 0 auto;
           display: grid; grid-template-columns: 1fr 0.85fr;
-          gap: 80px; align-items: center; position: relative; z-index: 1;
+          gap: 0;
+          align-items: center; position: relative; z-index: 1;
+        }
+        .about-left {
+          padding-right: 80px;
         }
         .about-eyebrow {
           display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
@@ -71,27 +75,40 @@ export default function About({ settings }) {
           font-size: 12px; color: rgba(245,237,224,0.32);
           line-height: 1.6; letter-spacing: 0.02em;
         }
+
+        /* right side — keeps its own color, logo floats in it */
         .about-right { position: relative; }
         .about-img-wrap { position: relative; }
-
-        /* no background — floats on the section itself */
         .about-img-placeholder {
           width: 100%; aspect-ratio: 3/4;
-          background: transparent;
+          background: linear-gradient(135deg, #1a1208 0%, #0d0a06 100%);
           display: flex; align-items: center; justify-content: center;
           position: relative; overflow: hidden;
         }
-
-        /* subtle diagonal shimmer that fades left→right so it blends into text side */
         .about-img-placeholder::before {
           content: '';
           position: absolute; inset: 0;
           background: repeating-linear-gradient(
             -45deg, transparent, transparent 20px,
-            rgba(201,147,58,0.018) 20px, rgba(201,147,58,0.018) 21px
+            rgba(201,147,58,0.02) 20px, rgba(201,147,58,0.02) 21px
           );
-          mask-image: linear-gradient(to right, transparent 0%, black 40%, black 100%);
-          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 40%, black 100%);
+        }
+
+        /* THIS is the blend — sits on top of the right side,
+           fades from the section bg color on the left edge to transparent,
+           so the join dissolves instead of cutting hard */
+        .about-img-placeholder::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: linear-gradient(
+            to right,
+            #0d0a06 0%,
+            #0d0a06 8%,
+            rgba(13,10,6,0.6) 25%,
+            transparent 55%
+          );
+          z-index: 2;
+          pointer-events: none;
         }
 
         .about-img-logo {
@@ -107,6 +124,7 @@ export default function About({ settings }) {
           position: absolute; bottom: -20px; left: -20px;
           background: #c9933a; padding: 20px 24px;
           box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+          z-index: 3;
         }
         .about-img-tag-num {
           font-family: 'Cormorant Garamond', serif;
@@ -121,7 +139,9 @@ export default function About({ settings }) {
           .about-root { padding: 80px 24px; }
           .about-top-line { left: 24px; right: 24px; }
           .about-inner { grid-template-columns: 1fr; gap: 48px; }
+          .about-left { padding-right: 0; }
           .about-right { order: -1; }
+          .about-img-placeholder::after { display: none; }
           .about-values { grid-template-columns: 1fr 1fr; }
         }
       `}</style>
@@ -130,7 +150,8 @@ export default function About({ settings }) {
         <div className="about-top-line" />
         <div className="about-watermark">TB</div>
         <div className="about-inner">
-          <div>
+
+          <div className="about-left">
             <div className="about-eyebrow">
               <div className="about-eyebrow-line" />
               <span>Our Story</span>
@@ -174,6 +195,7 @@ export default function About({ settings }) {
               </div>
             </div>
           </div>
+
         </div>
       </section>
     </>
