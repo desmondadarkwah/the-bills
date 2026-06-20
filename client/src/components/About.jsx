@@ -73,20 +73,27 @@ export default function About({ settings }) {
         }
         .about-right { position: relative; }
         .about-img-wrap { position: relative; }
+
+        /* blends seamlessly into the page — no visible box edge */
         .about-img-placeholder {
           width: 100%; aspect-ratio: 3/4;
-          background: linear-gradient(135deg, #1a1208 0%, #0d0a06 100%);
+          background: linear-gradient(135deg, #110d07 0%, #0d0a06 50%, #0a0806 100%);
           display: flex; align-items: center; justify-content: center;
           position: relative; overflow: hidden;
         }
+
+        /* diagonal texture fades out at the edges via mask */
         .about-img-placeholder::before {
           content: '';
           position: absolute; inset: 0;
           background: repeating-linear-gradient(
             -45deg, transparent, transparent 20px,
-            rgba(201,147,58,0.02) 20px, rgba(201,147,58,0.02) 21px
+            rgba(201,147,58,0.015) 20px, rgba(201,147,58,0.015) 21px
           );
+          mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+          -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
         }
+
         .about-img-logo {
           width: 62%;
           object-fit: contain;
@@ -95,6 +102,7 @@ export default function About({ settings }) {
           user-select: none; pointer-events: none;
           filter: brightness(3) sepia(1) saturate(2) hue-rotate(5deg);
         }
+
         .about-img-tag {
           position: absolute; bottom: -20px; left: -20px;
           background: #c9933a; padding: 20px 24px;
