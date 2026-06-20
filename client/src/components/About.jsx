@@ -97,19 +97,19 @@ export default function About({ settings }) {
         /* THIS is the blend — sits on top of the right side,
            fades from the section bg color on the left edge to transparent,
            so the join dissolves instead of cutting hard */
-        .about-img-placeholder::after {
-          content: '';
-          position: absolute; inset: 0;
-          background: linear-gradient(
-            to right,
-            #0d0a06 0%,
-            #0d0a06 8%,
-            rgba(13,10,6,0.6) 25%,
-            transparent 55%
-          );
-          z-index: 2;
-          pointer-events: none;
-        }
+           .about-img-placeholder::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to right,
+    #0d0a06 0%,
+    rgba(13,10,6,0.85) 12%,
+    rgba(13,10,6,0.2) 28%,
+    transparent 38%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
 
         .about-img-logo {
           width: 62%;
@@ -201,3 +201,5 @@ export default function About({ settings }) {
     </>
   )
 }
+
+
