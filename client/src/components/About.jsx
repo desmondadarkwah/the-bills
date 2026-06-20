@@ -1,3 +1,5 @@
+import logo from '../assets/billLogo.png'
+
 export default function About({ settings }) {
   return (
     <>
@@ -71,6 +73,8 @@ export default function About({ settings }) {
         }
         .about-right { position: relative; }
         .about-img-wrap { position: relative; }
+
+        /* ── THE ATMOSPHERIC IMAGE SLOT ── */
         .about-img-placeholder {
           width: 100%; aspect-ratio: 3/4;
           background: linear-gradient(135deg, #1a1208 0%, #0d0a06 100%);
@@ -81,14 +85,22 @@ export default function About({ settings }) {
         .about-img-placeholder::before {
           content: '';
           position: absolute; inset: 0;
-          background: repeating-linear-gradient(-45deg, transparent, transparent 20px, rgba(201,147,58,0.02) 20px, rgba(201,147,58,0.02) 21px);
+          background: repeating-linear-gradient(
+            -45deg, transparent, transparent 20px,
+            rgba(201,147,58,0.02) 20px, rgba(201,147,58,0.02) 21px
+          );
         }
-        .about-img-text {
-          font-family: 'Cormorant Garamond', serif;
-          font-weight: 700; font-size: 120px;
-          color: rgba(201,147,58,0.07); letter-spacing: -0.04em;
-          text-transform: uppercase; position: relative; z-index: 1;
+
+        /* logo image — same ghosted feel as the old TB text */
+        .about-img-logo {
+          width: 62%;
+          object-fit: contain;
+          opacity: 0.07;
+          position: relative; z-index: 1;
+          user-select: none; pointer-events: none;
+          filter: brightness(3) sepia(1) saturate(2) hue-rotate(5deg);
         }
+
         .about-img-tag {
           position: absolute; bottom: -20px; left: -20px;
           background: #c9933a; padding: 20px 24px;
@@ -148,7 +160,11 @@ export default function About({ settings }) {
           <div className="about-right">
             <div className="about-img-wrap">
               <div className="about-img-placeholder">
-                <span className="about-img-text">TB</span>
+                <img
+                  src={logo}
+                  alt="The Bills"
+                  className="about-img-logo"
+                />
               </div>
               <div className="about-img-tag">
                 <div className="about-img-tag-num">2026</div>
