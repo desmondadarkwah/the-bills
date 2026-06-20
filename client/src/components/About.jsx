@@ -75,13 +75,11 @@ export default function About({ settings }) {
           font-size: 12px; color: rgba(245,237,224,0.32);
           line-height: 1.6; letter-spacing: 0.02em;
         }
-
-        /* right side — keeps its own color, logo floats in it */
         .about-right { position: relative; }
         .about-img-wrap { position: relative; }
         .about-img-placeholder {
           width: 100%; aspect-ratio: 3/4;
-          background: linear-gradient(135deg, #1a1208 0%, #0d0a06 100%);
+          background: linear-gradient(135deg, #1a1208 0%, #120d07 50%, #0d0a06 100%);
           display: flex; align-items: center; justify-content: center;
           position: relative; overflow: hidden;
         }
@@ -93,24 +91,19 @@ export default function About({ settings }) {
             rgba(201,147,58,0.02) 20px, rgba(201,147,58,0.02) 21px
           );
         }
-
-        /* THIS is the blend — sits on top of the right side,
-           fades from the section bg color on the left edge to transparent,
-           so the join dissolves instead of cutting hard */
-           .about-img-placeholder::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(
-    to right,
-    #0d0a06 0%,
-    rgba(13,10,6,0.85) 12%,
-    rgba(13,10,6,0.2) 28%,
-    transparent 38%
-  );
-  z-index: 2;
-  pointer-events: none;
-}
-
+        .about-img-placeholder::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: linear-gradient(
+            to right,
+            #0d0a06 0%,
+            rgba(13,10,6,0.85) 12%,
+            rgba(13,10,6,0.2) 28%,
+            transparent 38%
+          );
+          z-index: 2;
+          pointer-events: none;
+        }
         .about-img-logo {
           width: 62%;
           object-fit: contain;
@@ -119,7 +112,6 @@ export default function About({ settings }) {
           user-select: none; pointer-events: none;
           filter: brightness(3) sepia(1) saturate(2) hue-rotate(5deg);
         }
-
         .about-img-tag {
           position: absolute; bottom: -20px; left: -20px;
           background: #c9933a; padding: 20px 24px;
@@ -201,5 +193,3 @@ export default function About({ settings }) {
     </>
   )
 }
-
-
