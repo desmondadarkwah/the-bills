@@ -94,3 +94,75 @@ export const deleteAdmin = async (id) => {
   const { data } = await axiosInstance.delete(`/api/auth/admins/${id}`)
   return data
 }
+
+// ─── VENDORS ──────────────────────────────────────────
+export const registerVendor = async (payload) => {
+  const { data } = await axiosInstance.post('/api/vendors/register', payload)
+  return data
+}
+
+export const loginVendor = async (payload) => {
+  const { data } = await axiosInstance.post('/api/vendors/login', payload)
+  return data
+}
+
+export const fetchVendorMe = async () => {
+  const { data } = await axiosInstance.get('/api/vendors/me')
+  return data.vendor
+}
+
+export const fetchVendorPublic = async (id) => {
+  const { data } = await axiosInstance.get(`/api/vendors/${id}`)
+  return data
+}
+
+// ─── VENDOR PRODUCTS ──────────────────────────────────
+export const fetchMyProducts = async () => {
+  const { data } = await axiosInstance.get('/api/products/mine')
+  return data.data || []
+}
+
+export const createVendorProduct = async (formData) => {
+  const { data } = await axiosInstance.post('/api/products/vendor', formData)
+  return data.data
+}
+
+export const updateVendorProduct = async (id, formData) => {
+  const { data } = await axiosInstance.put(`/api/products/vendor/${id}`, formData)
+  return data.data
+}
+
+export const deleteVendorProduct = async (id) => {
+  const { data } = await axiosInstance.delete(`/api/products/vendor/${id}`)
+  return data
+}
+
+// ─── ADMIN: VENDOR MANAGEMENT ─────────────────────────
+export const fetchAllVendors = async () => {
+  const { data } = await axiosInstance.get('/api/vendors-all/list')
+  return data.data || []
+}
+
+export const updateVendorStatus = async (id, status) => {
+  const { data } = await axiosInstance.put(`/api/vendors-all/${id}/status`, { status })
+  return data.data
+}
+
+export const toggleVendorVerified = async (id) => {
+  const { data } = await axiosInstance.put(`/api/vendors-all/${id}/verify`)
+  return data.data
+}
+
+export const deleteVendor = async (id) => {
+  const { data } = await axiosInstance.delete(`/api/vendors-all/${id}`)
+  return data
+}
+
+// ─── PRODUCT TRACKING ─────────────────────────────────
+export const trackProductView = async (id) => {
+  try { await axiosInstance.post(`/api/products/${id}/view`) } catch {}
+}
+
+export const trackProductClick = async (id) => {
+  try { await axiosInstance.post(`/api/products/${id}/click`) } catch {}
+}

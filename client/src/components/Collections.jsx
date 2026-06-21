@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { fetchProducts, fetchCollections } from '../utils/api'
+import { fetchProducts, fetchCollections, trackProductView, trackProductClick } from '../utils/api'
 import { useNavigate } from 'react-router-dom'
 
 const WhatsAppIcon = () => (
@@ -28,15 +28,15 @@ const CloseIcon = () => (
 )
 
 export default function Collections({ settings }) {
-  const [products, setProducts]         = useState([])
-  const [collections, setCollections]   = useState([])
+  const [products, setProducts] = useState([])
+  const [collections, setCollections] = useState([])
   const [activeFilter, setActiveFilter] = useState('All')
-  const [loading, setLoading]           = useState(true)
-  const [selected, setSelected]         = useState([])
-  const [wishlist, setWishlist]         = useState([])
-  const [selectMode, setSelectMode]     = useState(false)
-  const [viewProduct, setViewProduct]   = useState(null)
-  const [activeImg, setActiveImg]       = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [selected, setSelected] = useState([])
+  const [wishlist, setWishlist] = useState([])
+  const [selectMode, setSelectMode] = useState(false)
+  const [viewProduct, setViewProduct] = useState(null)
+  const [activeImg, setActiveImg] = useState(0)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function Collections({ settings }) {
     return () => { document.body.style.overflow = '' }
   }, [viewProduct])
 
-  const filters  = ['All', ...collections.map(c => c.name)]
+  const filters = ['All', ...collections.map(c => c.name)]
   const filtered = activeFilter === 'All' ? products : products.filter(p => p.collection === activeFilter)
 
   const toggleWishlist = (id) => {
@@ -69,13 +69,16 @@ export default function Collections({ settings }) {
   const clearSelect = () => { setSelected([]); setSelectMode(false) }
 
   const handleWhatsApp = (product) => {
-    const msg = `Hello The Bills!\n\nI'm interested in:\n\n*${product.name}*\nCategory: ${product.category}\nPrice: ${product.price}\n\nPlease provide more details. Thank you!`
-    window.open(`https://wa.me/${settings?.whatsapp || '233546805804'}?text=${encodeURIComponent(msg)}`, '_blank')
+    trackProductClick(product._id)
+    const vendorWhatsapp = product.vendor?.whatsapp
+    const targetNumber = vendorWhatsapp || settings?.whatsapp || '233546805804'
+    const msg = `Hello ${product.vendor ? product.vendor.shopName : 'The Bills'}!\n\nI'm interested in:\n\n*${product.name}*\nCategory: ${product.category}\nPrice: ${product.price}\n\nPlease provide more details. Thank you!`
+    window.open(`https://wa.me/${targetNumber}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   const handleBulkWhatsApp = (items) => {
     const list = items.map((p, i) => `${i + 1}. *${p.name}* — ${p.price}`).join('\n')
-    const msg  = `Hello The Bills!\n\nI'm interested in the following pieces:\n\n${list}\n\nPlease provide more details. Thank you!`
+    const msg = `Hello The Bills!\n\nI'm interested in the following pieces:\n\n${list}\n\nPlease provide more details. Thank you!`
     window.open(`https://wa.me/${settings?.whatsapp || '233546805804'}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
@@ -87,6 +90,7 @@ export default function Collections({ settings }) {
   const openView = (product) => {
     setViewProduct(product)
     setActiveImg(0)
+    trackProductView(product._id)
   }
 
   const closeView = () => setViewProduct(null)
@@ -723,6 +727,15 @@ export default function Collections({ settings }) {
               <div className="col-view-category">{viewProduct.category}</div>
               <div className="col-view-name">{viewProduct.name}</div>
               <div className="col-view-price">{viewProduct.price}</div>
+              {viewProduct.vendor && (
+                <div
+                  onClick={() => navigate(`/shop/${viewProduct.vendor._id}`)}
+                  style={{ fontSize: 11, color: 'rgba(245,237,224,0.4)', marginBottom: 16, letterSpacing: '0.05em', cursor: 'pointer' }}
+                >
+                  Sold by <span style={{ color: '#c9933a', fontWeight: 600, textDecoration: 'underline' }}>{viewProduct.vendor.shopName}</span>
+                  {viewProduct.vendor.verified && <span style={{ marginLeft: 6 }}>✓</span>}
+                </div>
+              )}
               <div className="col-view-divider" />
               <div className="col-view-label">Description</div>
               <p className="col-view-desc">{viewProduct.description || 'No description provided.'}</p>

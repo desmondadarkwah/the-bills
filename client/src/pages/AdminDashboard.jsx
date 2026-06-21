@@ -6,6 +6,7 @@ import {
   fetchAllCollections, createCollection, updateCollection, deleteCollection,
   fetchSettings, updateSettings as saveSettings,
   changePassword, addAdmin, fetchAdmins, deleteAdmin,
+  fetchAllVendors, updateVendorStatus, toggleVendorVerified, deleteVendor,
 } from '../utils/api'
 
 const STYLES = `
@@ -113,11 +114,12 @@ export default function AdminDashboard() {
   const handleLogout = () => { logout(); navigate('/manage/login') }
 
   const tabs = [
-    { id: 'overview',     label: 'Overview',    icon: '📊', group: 'main' },
-    { id: 'products',     label: 'Products',    icon: '👔', group: 'content' },
-    { id: 'collections',  label: 'Collections', icon: '🗂️', group: 'content' },
-    { id: 'settings',     label: 'Settings',    icon: '⚙️', group: 'system' },
-    { id: 'account',      label: 'Account',     icon: '👤', group: 'system' },
+    { id: 'overview', label: 'Overview', icon: '📊', group: 'main' },
+    { id: 'vendors', label: 'Vendors', icon: '🏪', group: 'main' },
+    { id: 'products', label: 'Products', icon: '👔', group: 'content' },
+    { id: 'collections', label: 'Collections', icon: '🗂️', group: 'content' },
+    { id: 'settings', label: 'Settings', icon: '⚙️', group: 'system' },
+    { id: 'account', label: 'Account', icon: '👤', group: 'system' },
   ]
 
   return (
@@ -141,7 +143,7 @@ export default function AdminDashboard() {
 
         <div className="adm-layout">
           <aside className="adm-sidebar">
-            {['main','content','system'].map(group => (
+            {['main', 'content', 'system'].map(group => (
               <div key={group}>
                 <div className="adm-sidebar-label">{group}</div>
                 {tabs.filter(t => t.group === group).map(tab => (
@@ -157,11 +159,12 @@ export default function AdminDashboard() {
           </aside>
 
           <main className="adm-main">
-            {activeTab === 'overview'    && <OverviewTab />}
-            {activeTab === 'products'    && <ProductsTab />}
+            {activeTab === 'overview' && <OverviewTab />}
+            {activeTab === 'vendors' && <VendorsTab />}
+            {activeTab === 'products' && <ProductsTab />}
             {activeTab === 'collections' && <CollectionsTab />}
-            {activeTab === 'settings'    && <SettingsTab />}
-            {activeTab === 'account'     && <AccountTab />}
+            {activeTab === 'settings' && <SettingsTab />}
+            {activeTab === 'account' && <AccountTab />}
           </main>
         </div>
 
@@ -213,10 +216,10 @@ function OverviewTab() {
   }, [])
 
   const stats = [
-    { label: 'Products',    value: products.length,                        icon: '👔' },
-    { label: 'Collections', value: collections.length,                     icon: '🗂️' },
-    { label: 'Available',   value: products.filter(p => p.available).length, icon: '✅' },
-    { label: 'Featured',    value: products.filter(p => p.featured).length,  icon: '⭐' },
+    { label: 'Products', value: products.length, icon: '👔' },
+    { label: 'Collections', value: collections.length, icon: '🗂️' },
+    { label: 'Available', value: products.filter(p => p.available).length, icon: '✅' },
+    { label: 'Featured', value: products.filter(p => p.featured).length, icon: '⭐' },
   ]
 
   return (
@@ -225,10 +228,10 @@ function OverviewTab() {
       <div className="adm-stat-grid">
         {stats.map(s => (
           <div key={s.label} className="adm-stat-card">
-            <div style={{ position:'absolute', top:14, right:14, fontSize:20, opacity:0.2 }}>{s.icon}</div>
+            <div style={{ position: 'absolute', top: 14, right: 14, fontSize: 20, opacity: 0.2 }}>{s.icon}</div>
             <div className="adm-stat-num">{s.value}</div>
             <div className="adm-stat-label">{s.label}</div>
-            <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:'#c9933a' }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: '#c9933a' }} />
           </div>
         ))}
       </div>
@@ -236,16 +239,24 @@ function OverviewTab() {
         <div className="adm-card-head"><span className="adm-card-title">Recent Products</span></div>
         {products.length === 0
           ? <div className="adm-empty"><p>No products yet.</p></div>
-          : products.slice(0,6).map(p => (
+          : products.slice(0, 6).map(p => (
             <div key={p._id} className="adm-row">
               {p.images?.[0]
-                ? <img src={p.images[0]} alt={p.name} style={{ width:44, height:44, objectFit:'cover', flexShrink:0, borderRadius:4 }} />
-                : <div style={{ width:44, height:44, background:'#f5f2ea', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontSize:16, color:'rgba(201,147,58,0.4)', borderRadius:4 }}>TB</div>
+                ? <img src={p.images[0]} alt={p.name} style={{ width: 44, height: 44, objectFit: 'cover', flexShrink: 0, borderRadius: 4 }} />
+                : <div style={{ width: 44, height: 44, background: '#f5f2ea', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16, color: 'rgba(201,147,58,0.4)', borderRadius: 4 }}>TB</div>
               }
-              <div style={{ flex:1, minWidth:0 }}>
-                <div className="adm-row-name">{p.name}</div>
-                <div className="adm-row-sub">{p.category} · {p.collection} · {p.price}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div className="adm-row-name">{p.name}</div>
+                  {p.vendor
+                    ? <span className="adm-badge adm-badge-gold">🏪 {p.vendor.shopName}</span>
+                    : <span className="adm-badge" style={{ background: 'rgba(10,8,6,0.06)', color: '#555', border: '1px solid rgba(0,0,0,0.1)' }}>Main Brand</span>
+                  }
+                </div>
+                <div className="adm-row-sub">{p.category} {p.collection && `· ${p.collection}`} · {p.price}</div>
+                <div className="adm-row-sub">{p.views || 0} views · {p.clicks || 0} clicks</div>
               </div>
+
               <span className={`adm-badge ${p.available ? 'adm-badge-green' : 'adm-badge-red'}`}>{p.available ? 'Live' : 'Hidden'}</span>
             </div>
           ))
@@ -255,15 +266,129 @@ function OverviewTab() {
   )
 }
 
+function VendorsTab() {
+  const [vendors, setVendors] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState('all')
+
+  useEffect(() => { load() }, [])
+  const load = () => fetchAllVendors().then(d => { setVendors(d); setLoading(false) }).catch(console.error)
+
+  const setStatus = async (id, status) => {
+    await updateVendorStatus(id, status)
+    load()
+  }
+
+  const toggleVerify = async (id) => {
+    await toggleVendorVerified(id)
+    load()
+  }
+
+  const del = async (id) => {
+    if (!confirm('Delete this vendor and ALL their products? This cannot be undone.')) return
+    await deleteVendor(id)
+    load()
+  }
+
+  const filtered = filter === 'all' ? vendors : vendors.filter(v => v.status === filter)
+  const counts = {
+    all: vendors.length,
+    pending: vendors.filter(v => v.status === 'pending').length,
+    approved: vendors.filter(v => v.status === 'approved').length,
+    rejected: vendors.filter(v => v.status === 'rejected').length,
+    suspended: vendors.filter(v => v.status === 'suspended').length,
+  }
+
+  const statusBadge = (status) => {
+    const map = {
+      pending: 'adm-badge-gold',
+      approved: 'adm-badge-green',
+      rejected: 'adm-badge-red',
+      suspended: 'adm-badge-red',
+    }
+    return map[status] || 'adm-badge-gold'
+  }
+
+  return (
+    <div>
+      <h2 className="adm-page-title"><span>🏪</span>Vendors</h2>
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+        {['all', 'pending', 'approved', 'rejected', 'suspended'].map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className="adm-btn"
+            style={{
+              background: filter === f ? '#c9933a' : 'transparent',
+              color: filter === f ? '#fff' : '#1a1a1a',
+              border: filter === f ? 'none' : '1px solid #d8d3c5',
+              textTransform: 'capitalize',
+            }}
+          >
+            {f} ({counts[f]})
+          </button>
+        ))}
+      </div>
+
+      <div className="adm-card">
+        {loading
+          ? <div className="adm-empty"><p>Loading…</p></div>
+          : filtered.length === 0
+            ? <div className="adm-empty"><div className="adm-empty-icon">TB</div><p>No vendors {filter !== 'all' ? `with status "${filter}"` : ''} yet.</p></div>
+            : filtered.map(v => (
+              <div key={v._id} className="adm-row" style={{ alignItems: 'flex-start' }}>
+                <div style={{ width: 44, height: 44, background: '#f5f2ea', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16, color: 'rgba(201,147,58,0.5)', fontFamily: "'Cormorant Garamond',serif", borderRadius: 4 }}>
+                  {v.shopName?.charAt(0).toUpperCase()}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                    <div className="adm-row-name">{v.shopName}</div>
+                    {v.verified && <span className="adm-badge adm-badge-gold">✓ Verified</span>}
+                    <span className={`adm-badge ${statusBadge(v.status)}`} style={{ textTransform: 'capitalize' }}>{v.status}</span>
+                  </div>
+                  <div className="adm-row-sub">{v.email} {v.phone && `· ${v.phone}`}</div>
+                  {v.bio && <div className="adm-row-sub" style={{ marginTop: 4, maxWidth: 400 }}>{v.bio}</div>}
+                  <div className="adm-row-sub" style={{ marginTop: 4 }}>Applied {new Date(v.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', flexShrink: 0, maxWidth: 220, justifyContent: 'flex-end' }}>
+                  {v.status === 'pending' && (
+                    <>
+                      <button className="adm-btn adm-btn-gold adm-btn-sm" onClick={() => setStatus(v._id, 'approved')}>Approve</button>
+                      <button className="adm-btn adm-btn-red adm-btn-sm" onClick={() => setStatus(v._id, 'rejected')}>Reject</button>
+                    </>
+                  )}
+                  {v.status === 'approved' && (
+                    <>
+                      <button className="adm-btn adm-btn-ghost adm-btn-sm" onClick={() => toggleVerify(v._id)}>{v.verified ? 'Unverify' : 'Verify'}</button>
+                      <button className="adm-btn adm-btn-red adm-btn-sm" onClick={() => setStatus(v._id, 'suspended')}>Suspend</button>
+                    </>
+                  )}
+                  {v.status === 'suspended' && (
+                    <button className="adm-btn adm-btn-gold adm-btn-sm" onClick={() => setStatus(v._id, 'approved')}>Reinstate</button>
+                  )}
+                  {v.status === 'rejected' && (
+                    <button className="adm-btn adm-btn-gold adm-btn-sm" onClick={() => setStatus(v._id, 'approved')}>Approve</button>
+                  )}
+                  <button className="adm-btn adm-btn-red adm-btn-sm" onClick={() => del(v._id)}>Delete</button>
+                </div>
+              </div>
+            ))
+        }
+      </div>
+    </div>
+  )
+}
+
 function ProductsTab() {
-  const [products, setProducts]     = useState([])
+  const [products, setProducts] = useState([])
   const [collections, setCollections] = useState([])
-  const [loading, setLoading]       = useState(true)
-  const [modal, setModal]           = useState(false)
-  const [editing, setEditing]       = useState(null)
-  const [form, setForm]             = useState({ name:'', description:'', price:'', category:'', collection:'', available:true, featured:false, order:0 })
-  const [images, setImages]         = useState([])
-  const [saving, setSaving]         = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [modal, setModal] = useState(false)
+  const [editing, setEditing] = useState(null)
+  const [form, setForm] = useState({ name: '', description: '', price: '', category: '', collection: '', available: true, featured: false, order: 0 })
+  const [images, setImages] = useState([])
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     load()
@@ -271,27 +396,27 @@ function ProductsTab() {
   }, [])
 
   const load = () => fetchAllProducts().then(d => { setProducts(d); setLoading(false) }).catch(console.error)
-  const openAdd  = () => { setEditing(null); setForm({ name:'',description:'',price:'',category:'',collection:'',available:true,featured:false,order:0 }); setImages([]); setModal(true) }
-  const openEdit = p => { setEditing(p); setForm({ name:p.name,description:p.description,price:p.price,category:p.category,collection:p.collection||'',available:p.available,featured:p.featured,order:p.order||0 }); setImages([]); setModal(true) }
+  const openAdd = () => { setEditing(null); setForm({ name: '', description: '', price: '', category: '', collection: '', available: true, featured: false, order: 0 }); setImages([]); setModal(true) }
+  const openEdit = p => { setEditing(p); setForm({ name: p.name, description: p.description, price: p.price, category: p.category, collection: p.collection || '', available: p.available, featured: p.featured, order: p.order || 0 }); setImages([]); setModal(true) }
 
   const save = async () => {
     setSaving(true)
     try {
       const fd = new FormData()
-      Object.entries(form).forEach(([k,v]) => fd.append(k,v))
+      Object.entries(form).forEach(([k, v]) => fd.append(k, v))
       images.forEach(img => fd.append('images', img))
       editing ? await updateProduct(editing._id, fd) : await createProduct(fd)
       load(); setModal(false)
-    } catch(e){ console.error(e) } finally { setSaving(false) }
+    } catch (e) { console.error(e) } finally { setSaving(false) }
   }
 
   const del = async id => { if (!confirm('Delete this product?')) return; await deleteProduct(id); load() }
 
   const toggle = async p => {
     const fd = new FormData()
-    fd.append('name',p.name); fd.append('description',p.description)
-    fd.append('price',p.price); fd.append('category',p.category); fd.append('collection',p.collection||'')
-    fd.append('available',!p.available); fd.append('featured',p.featured); fd.append('order',p.order||0)
+    fd.append('name', p.name); fd.append('description', p.description)
+    fd.append('price', p.price); fd.append('category', p.category); fd.append('collection', p.collection || '')
+    fd.append('available', !p.available); fd.append('featured', p.featured); fd.append('order', p.order || 0)
     await updateProduct(p._id, fd); load()
   }
 
@@ -309,15 +434,15 @@ function ProductsTab() {
             : products.map(p => (
               <div key={p._id} className="adm-row">
                 {p.images?.[0]
-                  ? <img src={p.images[0]} alt={p.name} style={{ width:52,height:52,objectFit:'cover',flexShrink:0, borderRadius:4 }} />
-                  : <div style={{ width:52,height:52,background:'#f5f2ea',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:18,color:'rgba(201,147,58,0.4)',fontFamily:"'Cormorant Garamond',serif", borderRadius:4 }}>TB</div>
+                  ? <img src={p.images[0]} alt={p.name} style={{ width: 52, height: 52, objectFit: 'cover', flexShrink: 0, borderRadius: 4 }} />
+                  : <div style={{ width: 52, height: 52, background: '#f5f2ea', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 18, color: 'rgba(201,147,58,0.4)', fontFamily: "'Cormorant Garamond',serif", borderRadius: 4 }}>TB</div>
                 }
-                <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="adm-row-name">{p.name}</div>
                   <div className="adm-row-sub">{p.category} {p.collection && `· ${p.collection}`} · {p.price}</div>
                 </div>
-                <div style={{ display:'flex', gap:6, alignItems:'center', flexShrink:0 }}>
-                  <button className={`adm-badge ${p.available ? 'adm-badge-green' : 'adm-badge-red'}`} style={{ cursor:'pointer', border:'none' }} onClick={() => toggle(p)}>{p.available ? 'Live' : 'Hidden'}</button>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+                  <button className={`adm-badge ${p.available ? 'adm-badge-green' : 'adm-badge-red'}`} style={{ cursor: 'pointer', border: 'none' }} onClick={() => toggle(p)}>{p.available ? 'Live' : 'Hidden'}</button>
                   <button className="adm-btn adm-btn-ghost adm-btn-sm" onClick={() => openEdit(p)}>Edit</button>
                   <button className="adm-btn adm-btn-red adm-btn-sm" onClick={() => del(p._id)}>Del</button>
                 </div>
@@ -327,14 +452,14 @@ function ProductsTab() {
       </div>
       {modal && (
         <Modal title={editing ? 'Edit Product' : 'Add Product'} onClose={() => setModal(false)}>
-          <Field label="Product Name"><input className="adm-input" value={form.name} onChange={e => setForm({...form,name:e.target.value})} placeholder="e.g. Ankara Blazer" /></Field>
-          <Field label="Description"><textarea className="adm-input" rows={3} value={form.description} onChange={e => setForm({...form,description:e.target.value})} /></Field>
+          <Field label="Product Name"><input className="adm-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Ankara Blazer" /></Field>
+          <Field label="Description"><textarea className="adm-input" rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></Field>
           <div className="adm-two-col">
-            <Field label="Price"><input className="adm-input" value={form.price} onChange={e => setForm({...form,price:e.target.value})} placeholder="e.g. GHS 450" /></Field>
-            <Field label="Category"><input className="adm-input" value={form.category} onChange={e => setForm({...form,category:e.target.value})} placeholder="e.g. Blazers" /></Field>
+            <Field label="Price"><input className="adm-input" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="e.g. GHS 450" /></Field>
+            <Field label="Category"><input className="adm-input" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="e.g. Blazers" /></Field>
           </div>
           <Field label="Collection">
-            <select className="adm-input" value={form.collection} onChange={e => setForm({...form,collection:e.target.value})}>
+            <select className="adm-input" value={form.collection} onChange={e => setForm({ ...form, collection: e.target.value })}>
               <option value="">No collection</option>
               {collections.map(c => <option key={c._id} value={c.name}>{c.name}</option>)}
             </select>
@@ -342,19 +467,19 @@ function ProductsTab() {
           <Field label="Images (up to 5)">
             <input type="file" accept="image/*" multiple className="adm-input" onChange={e => setImages(Array.from(e.target.files))} />
             {editing?.images?.length > 0 && images.length === 0 && (
-              <div style={{ display:'flex', gap:8, marginTop:8, flexWrap:'wrap' }}>
-                {editing.images.map((img,i) => <img key={i} src={img} alt="" style={{ height:60, objectFit:'cover', borderRadius:4 }} />)}
+              <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+                {editing.images.map((img, i) => <img key={i} src={img} alt="" style={{ height: 60, objectFit: 'cover', borderRadius: 4 }} />)}
               </div>
             )}
           </Field>
           <div className="adm-two-col">
-            <Field label="Display Order"><input type="number" className="adm-input" value={form.order} onChange={e => setForm({...form,order:e.target.value})} /></Field>
-            <div style={{ display:'flex', flexDirection:'column', gap:10, justifyContent:'flex-end', paddingBottom:2 }}>
-              <label className="adm-check-label"><input type="checkbox" checked={form.available} onChange={e => setForm({...form,available:e.target.checked})} />Available on site</label>
-              <label className="adm-check-label"><input type="checkbox" checked={form.featured} onChange={e => setForm({...form,featured:e.target.checked})} />Featured piece</label>
+            <Field label="Display Order"><input type="number" className="adm-input" value={form.order} onChange={e => setForm({ ...form, order: e.target.value })} /></Field>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, justifyContent: 'flex-end', paddingBottom: 2 }}>
+              <label className="adm-check-label"><input type="checkbox" checked={form.available} onChange={e => setForm({ ...form, available: e.target.checked })} />Available on site</label>
+              <label className="adm-check-label"><input type="checkbox" checked={form.featured} onChange={e => setForm({ ...form, featured: e.target.checked })} />Featured piece</label>
             </div>
           </div>
-          <button className="adm-btn adm-btn-dark" style={{ width:'100%', padding:'13px' }} onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update Product' : 'Add Product'}</button>
+          <button className="adm-btn adm-btn-dark" style={{ width: '100%', padding: '13px' }} onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update Product' : 'Add Product'}</button>
         </Modal>
       )}
     </div>
@@ -363,25 +488,25 @@ function ProductsTab() {
 
 function CollectionsTab() {
   const [collections, setCollections] = useState([])
-  const [loading, setLoading]         = useState(true)
-  const [modal, setModal]             = useState(false)
-  const [editing, setEditing]         = useState(null)
-  const [form, setForm]               = useState({ name:'', description:'', active:true, order:0 })
-  const [saving, setSaving]           = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [modal, setModal] = useState(false)
+  const [editing, setEditing] = useState(null)
+  const [form, setForm] = useState({ name: '', description: '', active: true, order: 0 })
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => { load() }, [])
   const load = () => fetchAllCollections().then(d => { setCollections(d); setLoading(false) }).catch(console.error)
-  const openAdd  = () => { setEditing(null); setForm({ name:'',description:'',active:true,order:0 }); setModal(true) }
-  const openEdit = c => { setEditing(c); setForm({ name:c.name,description:c.description,active:c.active,order:c.order||0 }); setModal(true) }
+  const openAdd = () => { setEditing(null); setForm({ name: '', description: '', active: true, order: 0 }); setModal(true) }
+  const openEdit = c => { setEditing(c); setForm({ name: c.name, description: c.description, active: c.active, order: c.order || 0 }); setModal(true) }
 
   const save = async () => {
     setSaving(true)
     try {
       const fd = new FormData()
-      Object.entries(form).forEach(([k,v]) => fd.append(k,v))
+      Object.entries(form).forEach(([k, v]) => fd.append(k, v))
       editing ? await updateCollection(editing._id, fd) : await createCollection(fd)
       load(); setModal(false)
-    } catch(e){ console.error(e) } finally { setSaving(false) }
+    } catch (e) { console.error(e) } finally { setSaving(false) }
   }
 
   const del = async id => { if (!confirm('Delete?')) return; await deleteCollection(id); load() }
@@ -399,12 +524,12 @@ function CollectionsTab() {
             ? <div className="adm-empty"><div className="adm-empty-icon">TB</div><p>No collections yet.</p></div>
             : collections.map(c => (
               <div key={c._id} className="adm-row">
-                <div style={{ width:44,height:44,background:'#f5f2ea',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:16,color:'rgba(201,147,58,0.4)',fontFamily:"'Cormorant Garamond',serif", borderRadius:4 }}>🗂️</div>
-                <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ width: 44, height: 44, background: '#f5f2ea', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16, color: 'rgba(201,147,58,0.4)', fontFamily: "'Cormorant Garamond',serif", borderRadius: 4 }}>🗂️</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="adm-row-name">{c.name}</div>
                   <div className="adm-row-sub">{c.description}</div>
                 </div>
-                <div style={{ display:'flex', gap:6, alignItems:'center', flexShrink:0 }}>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
                   <span className={`adm-badge ${c.active ? 'adm-badge-green' : 'adm-badge-red'}`}>{c.active ? 'Active' : 'Hidden'}</span>
                   <button className="adm-btn adm-btn-ghost adm-btn-sm" onClick={() => openEdit(c)}>Edit</button>
                   <button className="adm-btn adm-btn-red adm-btn-sm" onClick={() => del(c._id)}>Del</button>
@@ -415,13 +540,13 @@ function CollectionsTab() {
       </div>
       {modal && (
         <Modal title={editing ? 'Edit Collection' : 'Add Collection'} onClose={() => setModal(false)}>
-          <Field label="Collection Name"><input className="adm-input" value={form.name} onChange={e => setForm({...form,name:e.target.value})} placeholder="e.g. Modern Executive Suits" /></Field>
-          <Field label="Description"><textarea className="adm-input" rows={3} value={form.description} onChange={e => setForm({...form,description:e.target.value})} /></Field>
+          <Field label="Collection Name"><input className="adm-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Modern Executive Suits" /></Field>
+          <Field label="Description"><textarea className="adm-input" rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></Field>
           <div className="adm-two-col">
-            <Field label="Display Order"><input type="number" className="adm-input" value={form.order} onChange={e => setForm({...form,order:e.target.value})} /></Field>
-            <div style={{ display:'flex', alignItems:'flex-end', paddingBottom:2 }}><label className="adm-check-label"><input type="checkbox" checked={form.active} onChange={e => setForm({...form,active:e.target.checked})} />Active on site</label></div>
+            <Field label="Display Order"><input type="number" className="adm-input" value={form.order} onChange={e => setForm({ ...form, order: e.target.value })} /></Field>
+            <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 2 }}><label className="adm-check-label"><input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} />Active on site</label></div>
           </div>
-          <button className="adm-btn adm-btn-dark" style={{ width:'100%', padding:'13px' }} onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update' : 'Add Collection'}</button>
+          <button className="adm-btn adm-btn-dark" style={{ width: '100%', padding: '13px' }} onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update' : 'Add Collection'}</button>
         </Modal>
       )}
     </div>
@@ -429,19 +554,19 @@ function CollectionsTab() {
 }
 
 function SettingsTab() {
-  const [form, setForm] = useState({ brandName:'', tagline:'', phone:'', whatsapp:'', email:'', instagram:'', facebook:'', tiktok:'', about:'' })
+  const [form, setForm] = useState({ brandName: '', tagline: '', phone: '', whatsapp: '', email: '', instagram: '', facebook: '', tiktok: '', about: '' })
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving]   = useState(false)
-  const [saved, setSaved]     = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    fetchSettings().then(data => { setForm(prev => ({...prev,...data})); setLoading(false) }).catch(console.error)
+    fetchSettings().then(data => { setForm(prev => ({ ...prev, ...data })); setLoading(false) }).catch(console.error)
   }, [])
 
   const save = async () => {
     setSaving(true)
     try { await saveSettings(form); setSaved(true); setTimeout(() => setSaved(false), 3000) }
-    catch(e){ console.error(e) } finally { setSaving(false) }
+    catch (e) { console.error(e) } finally { setSaving(false) }
   }
 
   if (loading) return <div className="adm-empty"><p>Loading…</p></div>
@@ -450,37 +575,37 @@ function SettingsTab() {
     <div>
       <div className="adm-section-head">
         <h2 className="adm-page-title"><span>⚙️</span>Settings</h2>
-        <button className="adm-btn adm-btn-gold" style={{ padding:'10px 24px' }} onClick={save} disabled={saving}>
+        <button className="adm-btn adm-btn-gold" style={{ padding: '10px 24px' }} onClick={save} disabled={saving}>
           {saving ? 'Saving…' : saved ? '✓ Saved!' : 'Save Changes'}
         </button>
       </div>
       <div className="adm-settings-section">
         <div className="adm-settings-head"><div className="adm-settings-title">Brand Information</div></div>
         <div className="adm-settings-body">
-          <div className="adm-two-col" style={{ marginBottom:14 }}>
-            <Field label="Brand Name"><input className="adm-input" value={form.brandName} onChange={e => setForm({...form,brandName:e.target.value})} /></Field>
-            <Field label="Tagline"><input className="adm-input" value={form.tagline} onChange={e => setForm({...form,tagline:e.target.value})} /></Field>
+          <div className="adm-two-col" style={{ marginBottom: 14 }}>
+            <Field label="Brand Name"><input className="adm-input" value={form.brandName} onChange={e => setForm({ ...form, brandName: e.target.value })} /></Field>
+            <Field label="Tagline"><input className="adm-input" value={form.tagline} onChange={e => setForm({ ...form, tagline: e.target.value })} /></Field>
           </div>
-          <Field label="About"><textarea className="adm-input" rows={4} value={form.about} onChange={e => setForm({...form,about:e.target.value})} /></Field>
+          <Field label="About"><textarea className="adm-input" rows={4} value={form.about} onChange={e => setForm({ ...form, about: e.target.value })} /></Field>
         </div>
       </div>
       <div className="adm-settings-section">
         <div className="adm-settings-head"><div className="adm-settings-title">Contact Details</div></div>
         <div className="adm-settings-body">
-          <div className="adm-two-col" style={{ marginBottom:14 }}>
-            <Field label="Phone"><input className="adm-input" value={form.phone} onChange={e => setForm({...form,phone:e.target.value})} placeholder="+233 000 000 000" /></Field>
-            <Field label="WhatsApp (with country code)"><input className="adm-input" value={form.whatsapp} onChange={e => setForm({...form,whatsapp:e.target.value})} placeholder="233000000000" /></Field>
+          <div className="adm-two-col" style={{ marginBottom: 14 }}>
+            <Field label="Phone"><input className="adm-input" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+233 000 000 000" /></Field>
+            <Field label="WhatsApp (with country code)"><input className="adm-input" value={form.whatsapp} onChange={e => setForm({ ...form, whatsapp: e.target.value })} placeholder="233000000000" /></Field>
           </div>
-          <Field label="Email"><input className="adm-input" value={form.email} onChange={e => setForm({...form,email:e.target.value})} /></Field>
+          <Field label="Email"><input className="adm-input" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></Field>
         </div>
       </div>
       <div className="adm-settings-section">
         <div className="adm-settings-head"><div className="adm-settings-title">Social Media</div></div>
         <div className="adm-settings-body">
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
-            <Field label="Instagram"><input className="adm-input" value={form.instagram} onChange={e => setForm({...form,instagram:e.target.value})} placeholder="https://instagram.com/..." /></Field>
-            <Field label="Facebook"><input className="adm-input" value={form.facebook} onChange={e => setForm({...form,facebook:e.target.value})} placeholder="https://facebook.com/..." /></Field>
-            <Field label="TikTok"><input className="adm-input" value={form.tiktok} onChange={e => setForm({...form,tiktok:e.target.value})} placeholder="https://tiktok.com/..." /></Field>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+            <Field label="Instagram"><input className="adm-input" value={form.instagram} onChange={e => setForm({ ...form, instagram: e.target.value })} placeholder="https://instagram.com/..." /></Field>
+            <Field label="Facebook"><input className="adm-input" value={form.facebook} onChange={e => setForm({ ...form, facebook: e.target.value })} placeholder="https://facebook.com/..." /></Field>
+            <Field label="TikTok"><input className="adm-input" value={form.tiktok} onChange={e => setForm({ ...form, tiktok: e.target.value })} placeholder="https://tiktok.com/..." /></Field>
           </div>
         </div>
       </div>
@@ -490,15 +615,15 @@ function SettingsTab() {
 
 function AccountTab() {
   const { admin } = useAuth()
-  const [pwForm, setPwForm]           = useState({ currentPassword:'', newPassword:'', confirmPassword:'' })
-  const [pwSaving, setPwSaving]       = useState(false)
-  const [pwStatus, setPwStatus]       = useState('')
-  const [pwError, setPwError]         = useState('')
-  const [adminForm, setAdminForm]     = useState({ email:'', password:'' })
+  const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
+  const [pwSaving, setPwSaving] = useState(false)
+  const [pwStatus, setPwStatus] = useState('')
+  const [pwError, setPwError] = useState('')
+  const [adminForm, setAdminForm] = useState({ email: '', password: '' })
   const [adminSaving, setAdminSaving] = useState(false)
   const [adminStatus, setAdminStatus] = useState('')
-  const [adminError, setAdminError]   = useState('')
-  const [admins, setAdmins]           = useState([])
+  const [adminError, setAdminError] = useState('')
+  const [admins, setAdmins] = useState([])
 
   useEffect(() => { fetchAdmins().then(setAdmins).catch(console.error) }, [])
 
@@ -508,47 +633,47 @@ function AccountTab() {
     if (pwForm.newPassword !== pwForm.confirmPassword) { setPwError('Passwords do not match'); return }
     if (pwForm.newPassword.length < 6) { setPwError('Minimum 6 characters'); return }
     setPwSaving(true)
-    try { await changePassword({ currentPassword:pwForm.currentPassword, newPassword:pwForm.newPassword }); setPwStatus('ok'); setPwForm({ currentPassword:'',newPassword:'',confirmPassword:'' }); setTimeout(() => setPwStatus(''), 3000) }
-    catch(e){ setPwError(e.response?.data?.error || 'Failed') } finally { setPwSaving(false) }
+    try { await changePassword({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword }); setPwStatus('ok'); setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' }); setTimeout(() => setPwStatus(''), 3000) }
+    catch (e) { setPwError(e.response?.data?.error || 'Failed') } finally { setPwSaving(false) }
   }
 
   const addAdminFn = async () => {
     setAdminError(''); setAdminStatus('')
     if (!adminForm.email || !adminForm.password) { setAdminError('Email and password required'); return }
     setAdminSaving(true)
-    try { await addAdmin(adminForm); setAdminStatus('ok'); setAdminForm({ email:'',password:'' }); fetchAdmins().then(setAdmins); setTimeout(() => setAdminStatus(''), 3000) }
-    catch(e){ setAdminError(e.response?.data?.error || 'Failed') } finally { setAdminSaving(false) }
+    try { await addAdmin(adminForm); setAdminStatus('ok'); setAdminForm({ email: '', password: '' }); fetchAdmins().then(setAdmins); setTimeout(() => setAdminStatus(''), 3000) }
+    catch (e) { setAdminError(e.response?.data?.error || 'Failed') } finally { setAdminSaving(false) }
   }
 
   const delAdmin = async id => {
     if (!confirm('Remove this admin?')) return
     try { await deleteAdmin(id); fetchAdmins().then(setAdmins) }
-    catch(e){ alert(e.response?.data?.error || 'Failed') }
+    catch (e) { alert(e.response?.data?.error || 'Failed') }
   }
 
   return (
     <div>
       <h2 className="adm-page-title"><span>👤</span>Account</h2>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
         <div className="adm-settings-section">
           <div className="adm-settings-head"><div className="adm-settings-title">🔒 Change Password</div><div className="adm-settings-sub">{admin?.email}</div></div>
-          <div className="adm-settings-body" style={{ display:'flex', flexDirection:'column', gap:12 }}>
-            <Field label="Current Password"><input type="password" className="adm-input" value={pwForm.currentPassword} onChange={e => setPwForm({...pwForm,currentPassword:e.target.value})} /></Field>
-            <Field label="New Password"><input type="password" className="adm-input" value={pwForm.newPassword} onChange={e => setPwForm({...pwForm,newPassword:e.target.value})} /></Field>
-            <Field label="Confirm Password"><input type="password" className="adm-input" value={pwForm.confirmPassword} onChange={e => setPwForm({...pwForm,confirmPassword:e.target.value})} /></Field>
+          <div className="adm-settings-body" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <Field label="Current Password"><input type="password" className="adm-input" value={pwForm.currentPassword} onChange={e => setPwForm({ ...pwForm, currentPassword: e.target.value })} /></Field>
+            <Field label="New Password"><input type="password" className="adm-input" value={pwForm.newPassword} onChange={e => setPwForm({ ...pwForm, newPassword: e.target.value })} /></Field>
+            <Field label="Confirm Password"><input type="password" className="adm-input" value={pwForm.confirmPassword} onChange={e => setPwForm({ ...pwForm, confirmPassword: e.target.value })} /></Field>
             {pwError && <div className="adm-status err">✕ {pwError}</div>}
             {pwStatus === 'ok' && <div className="adm-status ok">✓ Password changed!</div>}
-            <button className="adm-btn adm-btn-dark" style={{ width:'100%', padding:'12px' }} onClick={changePw} disabled={pwSaving}>{pwSaving ? 'Changing…' : 'Change Password'}</button>
+            <button className="adm-btn adm-btn-dark" style={{ width: '100%', padding: '12px' }} onClick={changePw} disabled={pwSaving}>{pwSaving ? 'Changing…' : 'Change Password'}</button>
           </div>
         </div>
         <div className="adm-settings-section">
           <div className="adm-settings-head"><div className="adm-settings-title">➕ Add Admin</div></div>
-          <div className="adm-settings-body" style={{ display:'flex', flexDirection:'column', gap:12 }}>
-            <Field label="Email"><input type="email" className="adm-input" value={adminForm.email} onChange={e => setAdminForm({...adminForm,email:e.target.value})} /></Field>
-            <Field label="Password"><input type="password" className="adm-input" value={adminForm.password} onChange={e => setAdminForm({...adminForm,password:e.target.value})} /></Field>
+          <div className="adm-settings-body" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <Field label="Email"><input type="email" className="adm-input" value={adminForm.email} onChange={e => setAdminForm({ ...adminForm, email: e.target.value })} /></Field>
+            <Field label="Password"><input type="password" className="adm-input" value={adminForm.password} onChange={e => setAdminForm({ ...adminForm, password: e.target.value })} /></Field>
             {adminError && <div className="adm-status err">✕ {adminError}</div>}
             {adminStatus === 'ok' && <div className="adm-status ok">✓ Admin added!</div>}
-            <button className="adm-btn adm-btn-gold" style={{ width:'100%', padding:'12px' }} onClick={addAdminFn} disabled={adminSaving}>{adminSaving ? 'Adding…' : 'Add Admin'}</button>
+            <button className="adm-btn adm-btn-gold" style={{ width: '100%', padding: '12px' }} onClick={addAdminFn} disabled={adminSaving}>{adminSaving ? 'Adding…' : 'Add Admin'}</button>
           </div>
         </div>
       </div>
@@ -556,10 +681,10 @@ function AccountTab() {
         <div className="adm-card-head"><span className="adm-card-title">All Admins ({admins.length})</span></div>
         {admins.map(a => (
           <div key={a._id} className="adm-row">
-            <div style={{ width:36,height:36,background:'#f5f2ea',color:'#c9933a',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Cormorant Garamond',serif",fontWeight:700,fontSize:16,flexShrink:0, borderRadius:4 }}>{a.email?.charAt(0).toUpperCase()}</div>
-            <div style={{ flex:1 }}>
+            <div style={{ width: 36, height: 36, background: '#f5f2ea', color: '#c9933a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Cormorant Garamond',serif", fontWeight: 700, fontSize: 16, flexShrink: 0, borderRadius: 4 }}>{a.email?.charAt(0).toUpperCase()}</div>
+            <div style={{ flex: 1 }}>
               <div className="adm-row-name">{a.email}</div>
-              <div className="adm-row-sub">Added {new Date(a.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+              <div className="adm-row-sub">Added {new Date(a.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
             </div>
             {a.email === admin?.email
               ? <span className="adm-badge adm-badge-gold">You</span>
