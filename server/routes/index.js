@@ -14,7 +14,8 @@ import { getCollections, getAllCollections, createCollection, updateCollection, 
 import { getSettings, updateSettings } from '../controllers/settingsController.js'
 import {
   registerVendor, loginVendor, getVendorMe, getVendorPublic,
-  getAllVendors, updateVendorStatus, toggleVendorVerified, deleteVendor,
+  getAllVendors, updateVendorStatus, toggleVendorVerified, deleteVendor,  updateVendorProfile, changeVendorPassword,
+
 } from '../controllers/vendorController.js'
 
 const router = express.Router()
@@ -35,6 +36,8 @@ router.delete('/auth/admins/:id', protect, deleteAdmin)
 router.post('/vendors/register', registerVendor)
 router.post('/vendors/login', loginVendor)
 router.get('/vendors/me', protectVendor, getVendorMe)
+router.put('/vendors/me/update', protectVendor, updateVendorProfile)
+router.put('/vendors/me/password', protectVendor, changeVendorPassword)
 router.get('/vendors/:id', getVendorPublic)
 
 // ─── VENDOR MANAGEMENT (admin only) ───────────────────

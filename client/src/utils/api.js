@@ -166,3 +166,13 @@ export const trackProductView = async (id) => {
 export const trackProductClick = async (id) => {
   try { await axiosInstance.post(`/api/products/${id}/click`) } catch {}
 }
+
+export const updateVendorProfile = async (payload) => {
+  const { data } = await axiosInstance.put('/api/vendors/me/update', payload)
+  return data.vendor
+}
+
+export const changeVendorPassword = async (payload) => {
+  const { data } = await axiosInstance.put('/api/vendors/me/password', payload)
+  return data
+}

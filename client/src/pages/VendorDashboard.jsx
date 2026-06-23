@@ -3,8 +3,9 @@ import { useVendorAuth } from '../context/VendorAuthContext'
 import { useNavigate } from 'react-router-dom'
 import {
   fetchMyProducts, createVendorProduct, updateVendorProduct, deleteVendorProduct,
-  fetchAllCollections,
+  fetchAllCollections, updateVendorProfile, changeVendorPassword,
 } from '../utils/api'
+
 
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&display=swap');
@@ -87,46 +88,89 @@ export default function VendorDashboard() {
   const navigate = useNavigate()
   const handleLogout = () => { logout(); navigate('/vendor/login') }
 
-  const [products, setProducts]     = useState([])
+  const [products, setProducts] = useState([])
   const [collections, setCollections] = useState([])
-  const [loading, setLoading]       = useState(true)
-  const [modal, setModal]           = useState(false)
-  const [editing, setEditing]       = useState(null)
-  const [form, setForm]             = useState({ name:'', description:'', price:'', category:'', collection:'', available:true, order:0 })
-  const [images, setImages]         = useState([])
-  const [saving, setSaving]         = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [modal, setModal] = useState(false)
+  const [editing, setEditing] = useState(null)
+  const [form, setForm] = useState({ name: '', description: '', price: '', category: '', collection: '', available: true, order: 0 })
+  const [images, setImages] = useState([])
+  const [saving, setSaving] = useState(false)
+  const [activeTab, setActiveTab] = useState('products')
+
+  const [profileForm, setProfileForm] = useState({ shopName: '', phone: '', whatsapp: '', bio: '' })
+  const [profileSaving, setProfileSaving] = useState(false)
+  const [profileStatus, setProfileStatus] = useState('')
+  const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
+  const [pwSaving, setPwSaving] = useState(false)
+  const [pwStatus, setPwStatus] = useState('')
+  const [pwError, setPwError] = useState('')
 
   useEffect(() => {
     load()
     fetchAllCollections().then(setCollections).catch(console.error)
   }, [])
 
+  useEffect(() => {
+    if (vendor) {
+      setProfileForm({
+        shopName: vendor.shopName || '',
+        phone: vendor.phone || '',
+        whatsapp: vendor.whatsapp || '',
+        bio: vendor.bio || '',
+      })
+    }
+  }, [vendor])
+
   const load = () => fetchMyProducts().then(d => { setProducts(d); setLoading(false) }).catch(console.error)
-  const openAdd  = () => { setEditing(null); setForm({ name:'',description:'',price:'',category:'',collection:'',available:true,order:0 }); setImages([]); setModal(true) }
-  const openEdit = p => { setEditing(p); setForm({ name:p.name,description:p.description,price:p.price,category:p.category,collection:p.collection||'',available:p.available,order:p.order||0 }); setImages([]); setModal(true) }
+  const openAdd = () => { setEditing(null); setForm({ name: '', description: '', price: '', category: '', collection: '', available: true, order: 0 }); setImages([]); setModal(true) }
+  const openEdit = p => { setEditing(p); setForm({ name: p.name, description: p.description, price: p.price, category: p.category, collection: p.collection || '', available: p.available, order: p.order || 0 }); setImages([]); setModal(true) }
 
   const save = async () => {
     setSaving(true)
     try {
       const fd = new FormData()
-      Object.entries(form).forEach(([k,v]) => fd.append(k,v))
+      Object.entries(form).forEach(([k, v]) => fd.append(k, v))
       images.forEach(img => fd.append('images', img))
       editing ? await updateVendorProduct(editing._id, fd) : await createVendorProduct(fd)
       load(); setModal(false)
-    } catch(e){ alert(e.response?.data?.error || 'Something went wrong') } finally { setSaving(false) }
+    } catch (e) { alert(e.response?.data?.error || 'Something went wrong') } finally { setSaving(false) }
   }
 
   const del = async id => {
     if (!confirm('Delete this product?')) return
     try { await deleteVendorProduct(id); load() }
-    catch(e){ alert(e.response?.data?.error || 'Failed to delete') }
+    catch (e) { alert(e.response?.data?.error || 'Failed to delete') }
   }
 
   const stats = [
     { label: 'Total Products', value: products.length },
     { label: 'Live', value: products.filter(p => p.available).length },
-    { label: 'Total Views', value: products.reduce((sum,p) => sum + (p.views||0), 0) },
+    { label: 'Total Views', value: products.reduce((sum, p) => sum + (p.views || 0), 0) },
   ]
+
+  const saveProfile = async () => {
+    setProfileSaving(true); setProfileStatus('')
+    try {
+      await updateVendorProfile(profileForm)
+      setProfileStatus('ok')
+      setTimeout(() => setProfileStatus(''), 3000)
+    } catch (e) { setProfileStatus('err') } finally { setProfileSaving(false) }
+  }
+
+  const changePw = async () => {
+    setPwError(''); setPwStatus('')
+    if (!pwForm.currentPassword || !pwForm.newPassword || !pwForm.confirmPassword) { setPwError('All fields required'); return }
+    if (pwForm.newPassword !== pwForm.confirmPassword) { setPwError('Passwords do not match'); return }
+    if (pwForm.newPassword.length < 6) { setPwError('Minimum 6 characters'); return }
+    setPwSaving(true)
+    try {
+      await changeVendorPassword({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword })
+      setPwStatus('ok')
+      setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
+      setTimeout(() => setPwStatus(''), 3000)
+    } catch (e) { setPwError(e.response?.data?.error || 'Failed') } finally { setPwSaving(false) }
+  }
 
   return (
     <>
@@ -147,66 +191,135 @@ export default function VendorDashboard() {
         </nav>
 
         <main className="vd-main">
-          <h1 className="vd-page-title">My Shop</h1>
-          <p className="vd-shop-sub">Manage your products and track performance</p>
-
-          {!vendor?.verified && (
-            <div className="vd-pending-banner">
-              Your shop is approved but not yet verified. Verified shops get a badge that builds customer trust — your admin can verify you once you've established a track record.
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <h1 className="vd-page-title">My Shop</h1>
+              <p className="vd-shop-sub" style={{ margin: 0 }}>{vendor?.shopName}</p>
             </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {['products', 'settings'].map(t => (
+                <button key={t} onClick={() => setActiveTab(t)} className="vd-btn" style={{ background: activeTab === t ? '#c9933a' : 'transparent', color: activeTab === t ? '#fff' : '#1a1a1a', border: activeTab === t ? 'none' : '1px solid #d8d3c5', textTransform: 'capitalize' }}>{t}</button>
+              ))}
+            </div>
+          </div>
+
+          {activeTab === 'products' && (
+            <>
+              {!vendor?.verified && (
+                <div className="vd-pending-banner">
+                  Your shop is approved but not yet verified. Verified shops get a badge that builds customer trust — your admin can verify you once you've established a track record.
+                </div>
+              )}
+
+              <div className="vd-stat-grid">
+                {stats.map(s => (
+                  <div key={s.label} className="vd-stat-card">
+                    <div className="vd-stat-num">{s.value}</div>
+                    <div className="vd-stat-label">{s.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="vd-section-head">
+                <span className="vd-section-title">My Products</span>
+                <button className="vd-btn vd-btn-gold" onClick={openAdd}>+ Add Product</button>
+              </div>
+
+              <div className="vd-card">
+                {loading
+                  ? <div className="vd-empty"><p>Loading…</p></div>
+                  : products.length === 0
+                    ? <div className="vd-empty"><div className="vd-empty-icon">TB</div><p>No products yet. Click + Add Product to get started.</p></div>
+                    : products.map(p => (
+                      <div key={p._id} className="vd-row">
+                        {p.images?.[0]
+                          ? <img src={p.images[0]} alt={p.name} style={{ width: 52, height: 52, objectFit: 'cover', flexShrink: 0 }} />
+                          : <div style={{ width: 52, height: 52, background: '#f5f2ea', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 18, color: 'rgba(201,147,58,0.4)' }}>TB</div>
+                        }
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div className="vd-row-name">{p.name}</div>
+                          <div className="vd-row-sub">{p.category} {p.collection && `· ${p.collection}`} · {p.price}</div>
+                          <div className="vd-row-sub">{p.views || 0} views · {p.clicks || 0} clicks</div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+                          <span className={`vd-badge ${p.available ? 'vd-badge-green' : 'vd-badge-red'}`}>{p.available ? 'Live' : 'Hidden'}</span>
+                          <button className="vd-btn vd-btn-ghost vd-btn-sm" onClick={() => openEdit(p)}>Edit</button>
+                          <button className="vd-btn vd-btn-red vd-btn-sm" onClick={() => del(p._id)}>Del</button>
+                        </div>
+                      </div>
+                    ))
+                }
+              </div>
+            </>
           )}
 
-          <div className="vd-stat-grid">
-            {stats.map(s => (
-              <div key={s.label} className="vd-stat-card">
-                <div className="vd-stat-num">{s.value}</div>
-                <div className="vd-stat-label">{s.label}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="vd-section-head">
-            <span className="vd-section-title">My Products</span>
-            <button className="vd-btn vd-btn-gold" onClick={openAdd}>+ Add Product</button>
-          </div>
-
-          <div className="vd-card">
-            {loading
-              ? <div className="vd-empty"><p>Loading…</p></div>
-              : products.length === 0
-                ? <div className="vd-empty"><div className="vd-empty-icon">TB</div><p>No products yet. Click + Add Product to get started.</p></div>
-                : products.map(p => (
-                  <div key={p._id} className="vd-row">
-                    {p.images?.[0]
-                      ? <img src={p.images[0]} alt={p.name} style={{ width:52,height:52,objectFit:'cover',flexShrink:0 }} />
-                      : <div style={{ width:52,height:52,background:'#f5f2ea',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:18,color:'rgba(201,147,58,0.4)' }}>TB</div>
-                    }
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div className="vd-row-name">{p.name}</div>
-                      <div className="vd-row-sub">{p.category} {p.collection && `· ${p.collection}`} · {p.price}</div>
-                      <div className="vd-row-sub">{p.views || 0} views · {p.clicks || 0} clicks</div>
+          {activeTab === 'settings' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="vd-card">
+                <div style={{ padding: '16px 18px', borderBottom: '1px solid #f0ede5', fontFamily: "'Cormorant Garamond',serif", fontWeight: 600, fontSize: 16, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Shop Information</div>
+                <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  <div className="vd-field">
+                    <label className="vd-label">Shop Name</label>
+                    <input className="vd-input" value={profileForm.shopName} onChange={e => setProfileForm({ ...profileForm, shopName: e.target.value })} />
+                  </div>
+                  <div className="vd-two-col">
+                    <div className="vd-field">
+                      <label className="vd-label">Phone</label>
+                      <input className="vd-input" value={profileForm.phone} onChange={e => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="050 000 0000" />
                     </div>
-                    <div style={{ display:'flex', gap:6, alignItems:'center', flexShrink:0 }}>
-                      <span className={`vd-badge ${p.available ? 'vd-badge-green' : 'vd-badge-red'}`}>{p.available ? 'Live' : 'Hidden'}</span>
-                      <button className="vd-btn vd-btn-ghost vd-btn-sm" onClick={() => openEdit(p)}>Edit</button>
-                      <button className="vd-btn vd-btn-red vd-btn-sm" onClick={() => del(p._id)}>Del</button>
+                    <div className="vd-field">
+                      <label className="vd-label">WhatsApp (with country code)</label>
+                      <input className="vd-input" value={profileForm.whatsapp} onChange={e => setProfileForm({ ...profileForm, whatsapp: e.target.value })} placeholder="233500000000" />
                     </div>
                   </div>
-                ))
-            }
-          </div>
+                  <div className="vd-field">
+                    <label className="vd-label">Shop Bio</label>
+                    <textarea className="vd-input" rows={3} value={profileForm.bio} onChange={e => setProfileForm({ ...profileForm, bio: e.target.value })} />
+                  </div>
+                  {profileStatus === 'ok' && <div style={{ padding: '10px 14px', background: 'rgba(5,150,105,0.08)', borderLeft: '3px solid #059669', color: '#047857', fontSize: 12 }}>✓ Profile updated!</div>}
+                  {profileStatus === 'err' && <div style={{ padding: '10px 14px', background: 'rgba(220,38,38,0.08)', borderLeft: '3px solid #dc2626', color: '#b91c1c', fontSize: 12 }}>✕ Failed to update. Try again.</div>}
+                  <button className="vd-btn vd-btn-gold" style={{ alignSelf: 'flex-start', padding: '10px 28px' }} onClick={saveProfile} disabled={profileSaving}>
+                    {profileSaving ? 'Saving…' : profileStatus === 'ok' ? '✓ Saved!' : 'Save Changes'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="vd-card">
+                <div style={{ padding: '16px 18px', borderBottom: '1px solid #f0ede5', fontFamily: "'Cormorant Garamond',serif", fontWeight: 600, fontSize: 16, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Change Password</div>
+                <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 400 }}>
+                  <div className="vd-field">
+                    <label className="vd-label">Current Password</label>
+                    <input type="password" className="vd-input" value={pwForm.currentPassword} onChange={e => setPwForm({ ...pwForm, currentPassword: e.target.value })} />
+                  </div>
+                  <div className="vd-field">
+                    <label className="vd-label">New Password</label>
+                    <input type="password" className="vd-input" value={pwForm.newPassword} onChange={e => setPwForm({ ...pwForm, newPassword: e.target.value })} />
+                  </div>
+                  <div className="vd-field">
+                    <label className="vd-label">Confirm New Password</label>
+                    <input type="password" className="vd-input" value={pwForm.confirmPassword} onChange={e => setPwForm({ ...pwForm, confirmPassword: e.target.value })} />
+                  </div>
+                  {pwError && <div style={{ padding: '10px 14px', background: 'rgba(220,38,38,0.08)', borderLeft: '3px solid #dc2626', color: '#b91c1c', fontSize: 12 }}>✕ {pwError}</div>}
+                  {pwStatus === 'ok' && <div style={{ padding: '10px 14px', background: 'rgba(5,150,105,0.08)', borderLeft: '3px solid #059669', color: '#047857', fontSize: 12 }}>✓ Password changed!</div>}
+                  <button className="vd-btn vd-btn-gold" style={{ alignSelf: 'flex-start', padding: '10px 28px' }} onClick={changePw} disabled={pwSaving}>
+                    {pwSaving ? 'Changing…' : 'Change Password'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </main>
 
         {modal && (
           <Modal title={editing ? 'Edit Product' : 'Add Product'} onClose={() => setModal(false)}>
-            <Field label="Product Name"><input className="vd-input" value={form.name} onChange={e => setForm({...form,name:e.target.value})} placeholder="e.g. Kente Two-Piece" /></Field>
-            <Field label="Description"><textarea className="vd-input" rows={3} value={form.description} onChange={e => setForm({...form,description:e.target.value})} /></Field>
+            <Field label="Product Name"><input className="vd-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Kente Two-Piece" /></Field>
+            <Field label="Description"><textarea className="vd-input" rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></Field>
             <div className="vd-two-col">
-              <Field label="Price"><input className="vd-input" value={form.price} onChange={e => setForm({...form,price:e.target.value})} placeholder="e.g. GHS 350" /></Field>
-              <Field label="Category"><input className="vd-input" value={form.category} onChange={e => setForm({...form,category:e.target.value})} placeholder="e.g. Two-Piece Sets" /></Field>
+              <Field label="Price"><input className="vd-input" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="e.g. GHS 350" /></Field>
+              <Field label="Category"><input className="vd-input" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="e.g. Two-Piece Sets" /></Field>
             </div>
             <Field label="Collection (optional)">
-              <select className="vd-input" value={form.collection} onChange={e => setForm({...form,collection:e.target.value})}>
+              <select className="vd-input" value={form.collection} onChange={e => setForm({ ...form, collection: e.target.value })}>
                 <option value="">No collection</option>
                 {collections.map(c => <option key={c._id} value={c.name}>{c.name}</option>)}
               </select>
@@ -214,13 +327,13 @@ export default function VendorDashboard() {
             <Field label="Images (up to 5)">
               <input type="file" accept="image/*" multiple className="vd-input" onChange={e => setImages(Array.from(e.target.files))} />
               {editing?.images?.length > 0 && images.length === 0 && (
-                <div style={{ display:'flex', gap:8, marginTop:8, flexWrap:'wrap' }}>
-                  {editing.images.map((img,i) => <img key={i} src={img} alt="" style={{ height:60, objectFit:'cover' }} />)}
+                <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+                  {editing.images.map((img, i) => <img key={i} src={img} alt="" style={{ height: 60, objectFit: 'cover' }} />)}
                 </div>
               )}
             </Field>
-            <label className="vd-check-label"><input type="checkbox" checked={form.available} onChange={e => setForm({...form,available:e.target.checked})} />Available on site</label>
-            <button className="vd-btn vd-btn-gold" style={{ width:'100%', padding:'13px' }} onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update Product' : 'Add Product'}</button>
+            <label className="vd-check-label"><input type="checkbox" checked={form.available} onChange={e => setForm({ ...form, available: e.target.checked })} />Available on site</label>
+            <button className="vd-btn vd-btn-gold" style={{ width: '100%', padding: '13px' }} onClick={save} disabled={saving}>{saving ? 'Saving…' : editing ? 'Update Product' : 'Add Product'}</button>
           </Modal>
         )}
       </div>

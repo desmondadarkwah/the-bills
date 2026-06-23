@@ -113,3 +113,33 @@ export const deleteVendor = async (req, res) => {
     res.status(500).json({ error: err.message })
   }
 }
+
+// PUT /api/vendors/me/update — vendor updates own profile
+export const updateVendorProfile = async (req, res) => {
+  try {
+    const { shopName, phone, whatsapp, bio } = req.body
+    const vendor = await Vendor.findByIdAndUpdate(
+      req.vendor.id,
+      { shopName, phone, whatsapp, bio },
+      { new: true }
+    ).select('-password')
+    res.json({ success: true, vendor })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
+
+// PUT /api/vendors/me/password — vendor changes own password
+export const changeVendorPassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body
+    const vendor = await Vendor.findById(req.vendor.id)
+    if (!(await vendor.matchPassword(currentPassword)))
+      return res.status(400).json({ error: 'Current password is incorrect.' })
+    vendor.password = newPassword
+    await vendor.save()
+    res.json({ success: true, message: 'Password changed successfully.' })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
