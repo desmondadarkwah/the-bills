@@ -47,9 +47,8 @@ export default function VendorStorefront() {
 
   const handleWhatsApp = (product) => {
     trackProductClick(product._id)
-    const targetNumber = vendor?.whatsapp || siteSettings?.whatsapp || '233546805804'
-    const msg = `Hello ${vendor?.shopName}!\n\nI'm interested in:\n\n*${product.name}*\nCategory: ${product.category}\nPrice: ${product.price}\n\nPlease provide more details. Thank you!`
-    window.open(`https://wa.me/${targetNumber}?text=${encodeURIComponent(msg)}`, '_blank')
+    const msg = `Hello The Bills!\n\nI'm interested in:\n\n*${product.name}*\nCategory: ${product.category}\nPrice: ${product.price}\nShop: ${vendor?.shopName}\n\nPlease provide more details. Thank you!`
+    window.open(`https://wa.me/${siteSettings?.whatsapp || '233546805804'}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   if (loading) {

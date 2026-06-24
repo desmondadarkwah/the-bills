@@ -207,60 +207,119 @@ function Field({ label, children }) {
 }
 
 function OverviewTab() {
-  const [products, setProducts] = useState([])
+  const [products, setProducts]     = useState([])
   const [collections, setCollections] = useState([])
+  const [vendors, setVendors]       = useState([])
 
   useEffect(() => {
     fetchAllProducts().then(setProducts).catch(console.error)
     fetchAllCollections().then(setCollections).catch(console.error)
+    fetchAllVendors().then(setVendors).catch(console.error)
   }, [])
 
+  const pendingVendors  = vendors.filter(v => v.status === 'pending')
+  const approvedVendors = vendors.filter(v => v.status === 'approved')
+  const totalViews      = products.reduce((sum,p) => sum + (p.views||0), 0)
+  const totalClicks     = products.reduce((sum,p) => sum + (p.clicks||0), 0)
+  const vendorProducts  = products.filter(p => p.vendor)
+  const brandProducts   = products.filter(p => !p.vendor)
+
   const stats = [
-    { label: 'Products', value: products.length, icon: '👔' },
-    { label: 'Collections', value: collections.length, icon: '🗂️' },
-    { label: 'Available', value: products.filter(p => p.available).length, icon: '✅' },
-    { label: 'Featured', value: products.filter(p => p.featured).length, icon: '⭐' },
+    { label: 'Total Products',   value: products.length,       icon: '👔', color: '#c9933a' },
+    { label: 'Active Vendors',   value: approvedVendors.length, icon: '🏪', color: '#059669' },
+    { label: 'Pending Approval', value: pendingVendors.length,  icon: '⏳', color: '#d97706' },
+    { label: 'Collections',      value: collections.length,     icon: '🗂️', color: '#7c3aed' },
+    { label: 'Total Views',      value: totalViews,             icon: '👁️', color: '#2563eb' },
+    { label: 'Total Clicks',     value: totalClicks,            icon: '💬', color: '#dc2626' },
   ]
 
   return (
     <div>
       <h2 className="adm-page-title"><span>📊</span>Overview</h2>
-      <div className="adm-stat-grid">
+      <div className="adm-stat-grid" style={{ gridTemplateColumns:'repeat(3,1fr)' }}>
         {stats.map(s => (
           <div key={s.label} className="adm-stat-card">
-            <div style={{ position: 'absolute', top: 14, right: 14, fontSize: 20, opacity: 0.2 }}>{s.icon}</div>
-            <div className="adm-stat-num">{s.value}</div>
+            <div style={{ position:'absolute', top:14, right:14, fontSize:20, opacity:0.2 }}>{s.icon}</div>
+            <div className="adm-stat-num" style={{ color:s.color }}>{s.value}</div>
             <div className="adm-stat-label">{s.label}</div>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: '#c9933a' }} />
+            <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:s.color }} />
           </div>
         ))}
       </div>
-      <div className="adm-card">
-        <div className="adm-card-head"><span className="adm-card-title">Recent Products</span></div>
-        {products.length === 0
-          ? <div className="adm-empty"><p>No products yet.</p></div>
-          : products.slice(0, 6).map(p => (
+
+      {pendingVendors.length > 0 && (
+        <div style={{ background:'#fff8e8', border:'1px solid rgba(201,147,58,0.3)', padding:'14px 18px', marginBottom:16, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <span style={{ fontSize:13, color:'#8a5e1a' }}>⏳ <strong>{pendingVendors.length}</strong> vendor{pendingVendors.length > 1 ? 's' : ''} waiting for approval</span>
+        </div>
+      )}
+
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:16 }}>
+        <div className="adm-card">
+          <div className="adm-card-head"><span className="adm-card-title">Top Products by Views</span></div>
+          {[...products].sort((a,b) => (b.views||0)-(a.views||0)).slice(0,5).map(p => (
             <div key={p._id} className="adm-row">
               {p.images?.[0]
-                ? <img src={p.images[0]} alt={p.name} style={{ width: 44, height: 44, objectFit: 'cover', flexShrink: 0, borderRadius: 4 }} />
-                : <div style={{ width: 44, height: 44, background: '#f5f2ea', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16, color: 'rgba(201,147,58,0.4)', borderRadius: 4 }}>TB</div>
+                ? <img src={p.images[0]} alt={p.name} style={{ width:36,height:36,objectFit:'cover',flexShrink:0,borderRadius:3 }} />
+                : <div style={{ width:36,height:36,background:'#f5f2ea',flexShrink:0,borderRadius:3 }} />
               }
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div className="adm-row-name">{p.name}</div>
-                  {p.vendor
-                    ? <span className="adm-badge adm-badge-gold">🏪 {p.vendor.shopName}</span>
-                    : <span className="adm-badge" style={{ background: 'rgba(10,8,6,0.06)', color: '#555', border: '1px solid rgba(0,0,0,0.1)' }}>Main Brand</span>
-                  }
-                </div>
-                <div className="adm-row-sub">{p.category} {p.collection && `· ${p.collection}`} · {p.price}</div>
-                <div className="adm-row-sub">{p.views || 0} views · {p.clicks || 0} clicks</div>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div className="adm-row-name" style={{ fontSize:12 }}>{p.name}</div>
+                <div className="adm-row-sub">{p.vendor ? p.vendor.shopName : 'Main Brand'}</div>
               </div>
-
-              <span className={`adm-badge ${p.available ? 'adm-badge-green' : 'adm-badge-red'}`}>{p.available ? 'Live' : 'Hidden'}</span>
+              <div style={{ fontSize:12, color:'#c9933a', fontWeight:600 }}>{p.views||0} views</div>
             </div>
-          ))
-        }
+          ))}
+        </div>
+
+        <div className="adm-card">
+          <div className="adm-card-head"><span className="adm-card-title">Vendor Leaderboard</span></div>
+          {approvedVendors.length === 0
+            ? <div className="adm-empty"><p>No approved vendors yet.</p></div>
+            : approvedVendors.map(v => {
+              const vProducts = products.filter(p => p.vendor?._id === v._id || p.vendor === v._id)
+              const vViews    = vProducts.reduce((sum,p) => sum + (p.views||0), 0)
+              const vClicks   = vProducts.reduce((sum,p) => sum + (p.clicks||0), 0)
+              return (
+                <div key={v._id} className="adm-row">
+                  <div style={{ width:36,height:36,background:'#f5f2ea',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontFamily:"'Cormorant Garamond',serif",fontWeight:700,fontSize:16,color:'#c9933a',borderRadius:3 }}>{v.shopName?.charAt(0)}</div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div className="adm-row-name" style={{ fontSize:12 }}>{v.shopName} {v.verified && '✓'}</div>
+                    <div className="adm-row-sub">{vProducts.length} products</div>
+                  </div>
+                  <div style={{ textAlign:'right', fontSize:11, color:'rgba(0,0,0,0.4)' }}>
+                    <div>{vViews} views</div>
+                    <div>{vClicks} clicks</div>
+                  </div>
+                </div>
+              )
+            })
+          }
+        </div>
+      </div>
+
+      <div className="adm-card">
+        <div className="adm-card-head">
+          <span className="adm-card-title">Recent Products</span>
+          <div style={{ fontSize:11, color:'rgba(0,0,0,0.4)' }}>
+            {brandProducts.length} brand · {vendorProducts.length} vendor
+          </div>
+        </div>
+        {products.slice(0,8).map(p => (
+          <div key={p._id} className="adm-row">
+            {p.images?.[0]
+              ? <img src={p.images[0]} alt={p.name} style={{ width:44,height:44,objectFit:'cover',flexShrink:0,borderRadius:3 }} />
+              : <div style={{ width:44,height:44,background:'#f5f2ea',flexShrink:0,borderRadius:3 }} />
+            }
+            <div style={{ flex:1, minWidth:0 }}>
+              <div className="adm-row-name">{p.name}</div>
+              <div className="adm-row-sub">{p.vendor ? `🏪 ${p.vendor.shopName}` : '⭐ Main Brand'} · {p.price}</div>
+            </div>
+            <div style={{ textAlign:'right', fontSize:11, color:'rgba(0,0,0,0.4)', flexShrink:0 }}>
+              <div>{p.views||0} views</div>
+              <div>{p.clicks||0} clicks</div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )

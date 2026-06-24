@@ -13,7 +13,6 @@ export default function Navbar({ settings }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
@@ -63,17 +62,10 @@ export default function Navbar({ settings }) {
           width: 38px; height: 38px;
           flex-shrink: 0;
           display: flex; align-items: center; justify-content: center;
-          border: 1px solid rgba(201,147,58,0.3);
-          overflow: hidden;
-          transition: border-color 0.3s;
-        }
-        .nav-logo:hover .nav-logo-mark {
-          border-color: rgba(201,147,58,0.6);
         }
         .nav-logo-mark img {
           width: 100%; height: 100%;
-          object-fit: contain;
-          display: block;
+          object-fit: contain; display: block;
         }
 
         /* ── DESKTOP NAV ── */
@@ -89,8 +81,7 @@ export default function Navbar({ settings }) {
           font-size: 10px; font-weight: 400;
           letter-spacing: 0.28em; text-transform: uppercase;
           color: rgba(245,237,224,0.5);
-          text-decoration: none;
-          transition: color 0.25s;
+          text-decoration: none; transition: color 0.25s;
           position: relative; padding-bottom: 4px;
         }
         .nav-links a::before {
@@ -107,17 +98,15 @@ export default function Navbar({ settings }) {
           background: rgba(201,147,58,0.2);
         }
 
-        /* ── CTA BUTTON ── */
+        /* ── CTA ── */
         .nav-enquire {
           font-family: 'Barlow', sans-serif;
           font-size: 9px; font-weight: 500;
           letter-spacing: 0.28em; text-transform: uppercase;
-          color: #0a0806;
-          background: #c9933a;
+          color: #0a0806; background: #c9933a;
           border: none; padding: 11px 28px;
           cursor: pointer; transition: opacity 0.2s, box-shadow 0.3s;
           text-decoration: none; display: inline-block;
-          position: relative;
         }
         .nav-enquire:hover {
           opacity: 0.92;
@@ -172,6 +161,22 @@ export default function Navbar({ settings }) {
           background: linear-gradient(to bottom, transparent, #c9933a 40%, transparent);
         }
 
+        /* close button inside mobile menu */
+        .nav-mobile-close {
+          position: absolute; top: 24px; right: 28px; z-index: 10;
+          width: 38px; height: 38px;
+          background: rgba(201,147,58,0.08);
+          border: 1px solid rgba(201,147,58,0.25);
+          color: rgba(245,237,224,0.6);
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer; transition: all 0.2s;
+          font-size: 14px; line-height: 1;
+        }
+        .nav-mobile-close:hover {
+          border-color: #c9933a; color: #f5ede0;
+          background: rgba(201,147,58,0.12);
+        }
+
         .nav-mobile-watermark {
           position: absolute; bottom: -60px; right: -30px;
           font-family: 'Cormorant Garamond', serif;
@@ -186,25 +191,24 @@ export default function Navbar({ settings }) {
           align-items: center; gap: 0;
           position: relative; z-index: 2; width: 100%;
         }
-        .nav-mobile a {
+        .nav-mobile-links a {
           font-family: 'Cormorant Garamond', serif;
           font-weight: 300; font-size: clamp(36px, 9vw, 56px);
           letter-spacing: 0.06em; text-transform: uppercase;
           color: rgba(245,237,224,0.7); text-decoration: none;
           display: block; padding: 12px 32px;
           text-align: center; width: 100%;
-          transition: color 0.2s;
-          position: relative;
+          transition: color 0.2s; position: relative;
         }
-        .nav-mobile a::after {
+        .nav-mobile-links a::after {
           content: '';
           position: absolute; bottom: 10px;
           left: 50%; right: 50%;
           height: 1px; background: #c9933a;
           transition: left 0.35s ease, right 0.35s ease;
         }
-        .nav-mobile a:hover { color: #f5ede0; }
-        .nav-mobile a:hover::after { left: 32px; right: 32px; }
+        .nav-mobile-links a:hover { color: #f5ede0; }
+        .nav-mobile-links a:hover::after { left: 32px; right: 32px; }
 
         .nav-mobile-sep {
           width: 40px; height: 1px;
@@ -242,7 +246,6 @@ export default function Navbar({ settings }) {
 
       <div className="nav-root">
         <div className="nav-topline" />
-
         <div className={`nav-bar${scrolled ? ' scrolled' : ''}`}>
 
           {/* Logo */}
@@ -261,8 +264,8 @@ export default function Navbar({ settings }) {
                   <a href={`#${link.toLowerCase()}`}>{link}</a>
                 </li>
               ))}
+              <li><a href="/vendor/login">Vendor</a></li>
             </ul>
-            <div className="nav-divider" />
             <a href="#contact" className="nav-enquire">Enquire Now</a>
           </div>
 
@@ -277,26 +280,31 @@ export default function Navbar({ settings }) {
         </div>
       </div>
 
-      {/* Mobile full-screen menu */}
+      {/* Mobile full-screen menu — everything self-contained here */}
       <div className={`nav-mobile${menuOpen ? ' open' : ''}`}>
         <div className="nav-mobile-watermark">TB</div>
 
+        <button className="nav-mobile-close" onClick={() => setMenuOpen(false)}>✕</button>
+
         <div className="nav-mobile-links">
           {links.map(link => (
-            
-            <a  key={link}
+
+            <a key={link}
               href={`#${link.toLowerCase()}`}
               onClick={() => setMenuOpen(false)}
             >
               {link}
             </a>
           ))}
+          <a href="/vendor/login" onClick={() => setMenuOpen(false)}>
+            Vendor
+          </a>
         </div>
 
         <div className="nav-mobile-sep" />
 
-        
-         <a href="#contact"
+
+        <a href="#contact"
           className="nav-enquire"
           onClick={() => setMenuOpen(false)}
         >

@@ -70,11 +70,11 @@ export default function Collections({ settings }) {
 
   const handleWhatsApp = (product) => {
     trackProductClick(product._id)
-    const vendorWhatsapp = product.vendor?.whatsapp
-    const targetNumber = vendorWhatsapp || settings?.whatsapp || '233546805804'
-    const msg = `Hello ${product.vendor ? product.vendor.shopName : 'The Bills'}!\n\nI'm interested in:\n\n*${product.name}*\nCategory: ${product.category}\nPrice: ${product.price}\n\nPlease provide more details. Thank you!`
-    window.open(`https://wa.me/${targetNumber}?text=${encodeURIComponent(msg)}`, '_blank')
+    const msg = `Hello The Bills!\n\nI'm interested in:\n\n*${product.name}*\nCategory: ${product.category}\nPrice: ${product.price}${product.vendor ? `\nVendor: ${product.vendor.shopName}` : ''}\n\nPlease provide more details. Thank you!`
+    window.open(`https://wa.me/${settings?.whatsapp || '233546805804'}?text=${encodeURIComponent(msg)}`, '_blank')
   }
+
+
 
   const handleBulkWhatsApp = (items) => {
     const list = items.map((p, i) => `${i + 1}. *${p.name}* — ${p.price}`).join('\n')
