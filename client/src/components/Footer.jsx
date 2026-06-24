@@ -58,8 +58,6 @@ export default function Footer({ settings }) {
           letter-spacing: 0.05em; line-height: 1.7;
           max-width: 260px; margin-bottom: 24px;
         }
-
-        /* mini info row — location / hours */
         .footer-meta-row {
           display: flex; flex-direction: column; gap: 8px;
           margin-bottom: 26px;
@@ -75,7 +73,6 @@ export default function Footer({ settings }) {
           font-size: 11.5px; letter-spacing: 0.08em;
           color: rgba(245,237,224,0.28);
         }
-
         .footer-social {
           display: flex; gap: 10px;
         }
@@ -115,7 +112,44 @@ export default function Footer({ settings }) {
         }
         .footer-links a:hover { color: #c9933a; }
 
-        /* collections list — slightly different treatment, with count */
+        /* vendor link — slightly highlighted to stand out */
+        .footer-vendor-link {
+          display: flex; align-items: center; gap: 8px;
+          font-size: 12.5px; letter-spacing: 0.09em;
+          color: rgba(201,147,58,0.6) !important;
+          text-decoration: none; transition: color 0.2s;
+        }
+        .footer-vendor-link:hover { color: #c9933a !important; }
+        .footer-vendor-dot {
+          width: 4px; height: 4px; border-radius: 50%;
+          background: rgba(201,147,58,0.5); flex-shrink: 0;
+        }
+
+        /* vendor CTA block — sits below navigate links */
+        .footer-vendor-cta {
+          margin-top: 24px;
+          padding-top: 20px;
+          border-top: 1px solid rgba(201,147,58,0.08);
+        }
+        .footer-vendor-cta-label {
+          font-size: 8.5px; letter-spacing: 0.28em; text-transform: uppercase;
+          color: rgba(245,237,224,0.2); margin-bottom: 10px;
+        }
+        .footer-vendor-cta-btn {
+          display: inline-block;
+          font-size: 9px; font-weight: 500;
+          letter-spacing: 0.22em; text-transform: uppercase;
+          padding: 10px 20px;
+          border: 1px solid rgba(201,147,58,0.35);
+          color: rgba(201,147,58,0.75);
+          text-decoration: none; transition: all 0.22s;
+        }
+        .footer-vendor-cta-btn:hover {
+          border-color: #c9933a; color: #c9933a;
+          background: rgba(201,147,58,0.05);
+        }
+
+        /* collections list */
         .footer-collection-row {
           display: flex; align-items: center; justify-content: space-between;
           gap: 10px;
@@ -179,14 +213,12 @@ export default function Footer({ settings }) {
               <div className="footer-brand-row">
                 <img src={logo} alt={settings?.brandName || 'The Bills'} className="footer-logo-img" />
                 <div className="footer-wordmark">
-                  {settings?.shortName || 'thebills'}
+                  {settings?.shortName || 'TB'}
                 </div>
               </div>
-
               <div className="footer-tagline">
                 {settings?.tagline || 'Crafted for the world, rooted in tradition.'}
               </div>
-
               <div className="footer-meta-row">
                 <div className="footer-meta-item">
                   <div className="footer-meta-dot" />
@@ -201,7 +233,6 @@ export default function Footer({ settings }) {
                   <span className="footer-meta-text">Custom orders welcome</span>
                 </div>
               </div>
-
               <div className="footer-social">
                 {settings?.instagram && (
                   <a href={settings.instagram} target="_blank" rel="noreferrer" className="footer-social-btn" title="Instagram">
@@ -237,7 +268,22 @@ export default function Footer({ settings }) {
                 <li><a href="#collections">Collections</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
+                <li><a href="/wishlist">Saved Items</a></li>
+                <li>
+                  <a href="/vendor/login" className="footer-vendor-link">
+                    <span className="footer-vendor-dot" />
+                    Vendor Login
+                  </a>
+                </li>
               </ul>
+
+              {/* Vendor CTA block */}
+              <div className="footer-vendor-cta">
+                <div className="footer-vendor-cta-label">Are you a designer?</div>
+                <a href="/vendor/register" className="footer-vendor-cta-btn">
+                  Open Your Shop →
+                </a>
+              </div>
             </div>
 
             {/* ── COLLECTIONS (dynamic) ── */}
@@ -247,7 +293,7 @@ export default function Footer({ settings }) {
                 <ul className="footer-links">
                   {collections.slice(0, 6).map(c => (
                     <li key={c._id || c.name}>
-                      <a href={`#collections`} className="footer-collection-row">
+                      <a href="#collections" className="footer-collection-row">
                         <span>{c.name}</span>
                         {typeof c.count === 'number' && (
                           <span className="footer-collection-count">{c.count}</span>
@@ -287,6 +333,8 @@ export default function Footer({ settings }) {
               © {year} <span>{settings?.brandName || 'The Bills'}</span>. All rights reserved.
             </div>
             <div className="footer-bottom-right">
+              <a href="/vendor/register" className="footer-bottom-link">Sell With Us</a>
+              <div className="footer-separator" />
               <span className="footer-bottom-link">{settings?.location || 'Accra, Ghana'}</span>
               <div className="footer-separator" />
               <span className="footer-bottom-link">Crafted for the world</span>
