@@ -28,15 +28,15 @@ const CloseIcon = () => (
 )
 
 export default function Collections({ settings }) {
-  const [products, setProducts] = useState([])
-  const [collections, setCollections] = useState([])
+  const [products, setProducts]         = useState([])
+  const [collections, setCollections]   = useState([])
   const [activeFilter, setActiveFilter] = useState('All')
-  const [loading, setLoading] = useState(true)
-  const [selected, setSelected] = useState([])
-  const [wishlist, setWishlist] = useState([])
-  const [selectMode, setSelectMode] = useState(false)
-  const [viewProduct, setViewProduct] = useState(null)
-  const [activeImg, setActiveImg] = useState(0)
+  const [loading, setLoading]           = useState(true)
+  const [selected, setSelected]         = useState([])
+  const [wishlist, setWishlist]         = useState([])
+  const [selectMode, setSelectMode]     = useState(false)
+  const [viewProduct, setViewProduct]   = useState(null)
+  const [activeImg, setActiveImg]       = useState(0)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -53,8 +53,11 @@ export default function Collections({ settings }) {
     return () => { document.body.style.overflow = '' }
   }, [viewProduct])
 
-  const filters = ['All', ...collections.map(c => c.name)]
-  const filtered = activeFilter === 'All' ? products : products.filter(p => p.collection === activeFilter)
+  const filters     = ['All', ...collections.map(c => c.name)]
+  const filtered    = activeFilter === 'All' ? products : products.filter(p => p.collection === activeFilter)
+  const featured    = products.filter(p => p.featured)
+  const newArrivals = [...products].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 18)
+  const mostViewed  = [...products].sort((a, b) => (b.views || 0) - (a.views || 0)).filter(p => (p.views || 0) > 0).slice(0, 10)
 
   const toggleWishlist = (id) => {
     const updated = wishlist.includes(id) ? wishlist.filter(w => w !== id) : [...wishlist, id]
@@ -74,11 +77,9 @@ export default function Collections({ settings }) {
     window.open(`https://wa.me/${settings?.whatsapp || '233546805804'}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
-
-
   const handleBulkWhatsApp = (items) => {
     const list = items.map((p, i) => `${i + 1}. *${p.name}* — ${p.price}`).join('\n')
-    const msg = `Hello The Bills!\n\nI'm interested in the following pieces:\n\n${list}\n\nPlease provide more details. Thank you!`
+    const msg  = `Hello The Bills!\n\nI'm interested in the following pieces:\n\n${list}\n\nPlease provide more details. Thank you!`
     window.open(`https://wa.me/${settings?.whatsapp || '233546805804'}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
@@ -111,583 +112,613 @@ export default function Collections({ settings }) {
           background: linear-gradient(90deg, transparent, rgba(201,147,58,0.22) 30%, rgba(201,147,58,0.22) 70%, transparent);
         }
 
-        /* ── HEADER ── */
-        .col-header {
+        /* ── SECTION HEADER ── */
+        .col-sec-head {
           display: flex; align-items: flex-end;
           justify-content: space-between;
-          margin-bottom: 56px; gap: 24px; flex-wrap: wrap;
+          margin-bottom: 24px; gap: 16px;
         }
         .col-eyebrow {
-          display: flex; align-items: center; gap: 16px; margin-bottom: 18px;
+          display: flex; align-items: center; gap: 16px; margin-bottom: 10px;
         }
         .col-eyebrow-line { width: 32px; height: 1px; background: #c9933a; }
         .col-eyebrow span {
-          font-size: 9.5px;
-          letter-spacing: 0.36em; text-transform: uppercase; color: #c9933a;
+          font-size: 9.5px; letter-spacing: 0.36em;
+          text-transform: uppercase; color: #c9933a;
         }
         .col-title {
           font-family: 'Cormorant Garamond', serif;
-          font-weight: 300; font-size: clamp(36px, 5vw, 64px);
+          font-weight: 300; font-size: clamp(24px, 3.5vw, 44px);
           line-height: 0.95; letter-spacing: -0.01em;
           color: #f5ede0; text-transform: uppercase; margin: 0;
         }
         .col-title em { font-style: italic; color: #c9933a; }
+        .col-sec-divider {
+          width: 100%; height: 1px;
+          background: rgba(201,147,58,0.08);
+          margin: 56px 0 48px;
+        }
 
-        /* ── TOOLBAR ── */
+        /* ══ FEATURED — wide tall cards ══ */
+        .hs-featured-wrap {
+          display: flex; gap: 3px;
+          overflow-x: auto;
+          scrollbar-width: none; -ms-overflow-style: none;
+          cursor: grab; padding-bottom: 4px;
+        }
+        .hs-featured-wrap::-webkit-scrollbar { display: none; }
+        .hs-featured-wrap:active { cursor: grabbing; }
+
+        .hs-feat-card {
+          flex-shrink: 0; width: 420px;
+          position: relative; overflow: hidden;
+          background: #100e0a; cursor: pointer;
+        }
+        .hs-feat-img {
+          width: 100%; height: 520px;
+          object-fit: cover; display: block;
+          transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+        .hs-feat-card:hover .hs-feat-img { transform: scale(1.04); }
+        .hs-feat-ph {
+          width: 100%; height: 520px;
+          background: linear-gradient(160deg,#1a1208,#0d0a06);
+          display: flex; align-items: center; justify-content: center;
+        }
+        .hs-feat-ph span {
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 700; font-size: 80px;
+          color: rgba(201,147,58,0.07);
+        }
+        .hs-feat-badge {
+          position: absolute; top: 16px; left: 16px; z-index: 3;
+          background: #c9933a; color: #0a0806;
+          font-size: 8px; font-weight: 600;
+          letter-spacing: 0.2em; text-transform: uppercase;
+          padding: 5px 12px;
+        }
+        .hs-feat-info {
+          position: absolute; bottom: 0; left: 0; right: 0;
+          padding: 40px 22px 20px;
+          background: linear-gradient(to top, rgba(10,8,6,0.97) 0%, transparent 100%);
+        }
+        .hs-feat-cat {
+          font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
+          color: #c9933a; margin-bottom: 6px;
+        }
+        .hs-feat-name {
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 500; font-size: 20px;
+          color: #f5ede0; text-transform: uppercase; margin-bottom: 3px;
+        }
+        .hs-feat-price {
+          font-size: 11px; color: rgba(245,237,224,0.4); letter-spacing: 0.1em;
+        }
+
+        /* ══ NEW ARRIVALS — 3-row horizontal tile grid ══ */
+        .hs-new-scroll {
+          overflow-x: auto;
+          scrollbar-width: none; -ms-overflow-style: none;
+          cursor: grab; padding-bottom: 4px;
+        }
+        .hs-new-scroll::-webkit-scrollbar { display: none; }
+        .hs-new-scroll:active { cursor: grabbing; }
+
+        .hs-new-grid {
+          display: grid;
+          grid-template-rows: repeat(3, 110px);
+          grid-auto-flow: column;
+          grid-auto-columns: 110px;
+          gap: 3px;
+          width: max-content;
+        }
+
+        .hs-new-tile {
+          position: relative; overflow: hidden;
+          background: #0f0d09; cursor: pointer;
+        }
+        .hs-new-tile img {
+          width: 100%; height: 100%;
+          object-fit: cover; display: block;
+          transition: transform 0.4s ease;
+        }
+        .hs-new-tile:hover img { transform: scale(1.08); }
+        .hs-new-tile-ph {
+          width: 100%; height: 100%;
+          background: linear-gradient(135deg,#15100a,#0a0806);
+          display: flex; align-items: center; justify-content: center;
+        }
+        .hs-new-tile-ph span {
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 700; font-size: 22px;
+          color: rgba(201,147,58,0.07);
+        }
+
+        /* ══ MOST VIEWED — medium portrait ══ */
+        .hs-mv-wrap {
+          display: flex; gap: 3px;
+          overflow-x: auto;
+          scrollbar-width: none; -ms-overflow-style: none;
+          cursor: grab; padding-bottom: 4px;
+        }
+        .hs-mv-wrap::-webkit-scrollbar { display: none; }
+        .hs-mv-wrap:active { cursor: grabbing; }
+
+        .hs-mv-card {
+          flex-shrink: 0; width: 260px;
+          position: relative; overflow: hidden;
+          background: #0f0d09; cursor: pointer;
+        }
+        .hs-mv-img {
+          width: 100%; height: 340px;
+          object-fit: cover; display: block;
+          transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+        .hs-mv-card:hover .hs-mv-img { transform: scale(1.05); }
+        .hs-mv-ph {
+          width: 100%; height: 340px;
+          background: linear-gradient(160deg,#1a1208,#0d0a06);
+          display: flex; align-items: center; justify-content: center;
+        }
+        .hs-mv-ph span {
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 700; font-size: 56px;
+          color: rgba(201,147,58,0.07);
+        }
+        .hs-mv-info {
+          position: absolute; bottom: 0; left: 0; right: 0;
+          padding: 32px 16px 14px;
+          background: linear-gradient(to top, rgba(10,8,6,0.96) 0%, transparent 100%);
+        }
+        .hs-mv-cat {
+          font-size: 8.5px; letter-spacing: 0.28em; text-transform: uppercase;
+          color: #c9933a; margin-bottom: 4px;
+        }
+        .hs-mv-name {
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 500; font-size: 15px;
+          color: #f5ede0; text-transform: uppercase; margin-bottom: 2px;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .hs-mv-price {
+          font-size: 10.5px; color: rgba(245,237,224,0.32); letter-spacing: 0.1em;
+        }
+
+        /* shared heart btn */
+        .col-heart-btn {
+          position: absolute; top: 10px; right: 10px; z-index: 4;
+          width: 30px; height: 30px;
+          background: rgba(10,8,6,0.65); border: 1px solid rgba(201,147,58,0.2);
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px);
+        }
+        .col-heart-btn:hover { background: rgba(10,8,6,0.9); border-color: rgba(201,147,58,0.6); }
+
+        /* ── BROWSE ALL HEADER ── */
+        .col-header {
+          display: flex; align-items: flex-end;
+          justify-content: space-between;
+          margin-bottom: 24px; gap: 24px; flex-wrap: wrap;
+        }
         .col-toolbar {
           display: flex; align-items: center;
-          gap: 10px; flex-wrap: wrap;
-          justify-content: flex-end;
+          gap: 10px; flex-wrap: wrap; justify-content: flex-end;
         }
-        .col-filters {
-          display: flex; align-items: center;
-          gap: 6px; flex-wrap: wrap;
-        }
+        .col-filters { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
         .col-filter-btn {
-          font-size: 9px;
-          letter-spacing: 0.2em; text-transform: uppercase;
-          padding: 9px 18px;
+          font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+          padding: 8px 16px;
           border: 1px solid rgba(201,147,58,0.16);
           background: transparent; color: rgba(245,237,224,0.35);
           cursor: pointer; transition: all 0.2s;
         }
-        .col-filter-btn:hover {
-          border-color: rgba(201,147,58,0.45);
-          color: rgba(245,237,224,0.65);
-        }
-        .col-filter-btn.active {
-          background: #c9933a; color: #0a0806; border-color: #c9933a;
-        }
-
-        .col-toolbar-sep {
-          width: 1px; height: 18px;
-          background: rgba(201,147,58,0.15); flex-shrink: 0;
-        }
-
+        .col-filter-btn:hover { border-color: rgba(201,147,58,0.45); color: rgba(245,237,224,0.65); }
+        .col-filter-btn.active { background: #c9933a; color: #0a0806; border-color: #c9933a; }
+        .col-toolbar-sep { width: 1px; height: 18px; background: rgba(201,147,58,0.15); flex-shrink: 0; }
         .col-action-btn {
           font-size: 9px; font-weight: 500;
           letter-spacing: 0.18em; text-transform: uppercase;
-          padding: 9px 16px; cursor: pointer; transition: all 0.2s;
+          padding: 8px 14px; cursor: pointer; transition: all 0.2s;
           display: flex; align-items: center; gap: 7px; border: none;
           background: none; white-space: nowrap;
         }
-        .col-action-btn svg { flex-shrink: 0; }
         .col-action-btn-select {
           color: rgba(201,147,58,0.7);
           border: 1px solid rgba(201,147,58,0.2) !important;
           background: rgba(201,147,58,0.04) !important;
         }
-        .col-action-btn-select:hover {
-          background: rgba(201,147,58,0.1) !important;
-          color: #c9933a;
-        }
+        .col-action-btn-select:hover { background: rgba(201,147,58,0.1) !important; color: #c9933a; }
         .col-action-btn-select.active {
           background: rgba(201,147,58,0.12) !important;
-          border-color: rgba(201,147,58,0.4) !important;
-          color: #c9933a;
+          border-color: rgba(201,147,58,0.4) !important; color: #c9933a;
         }
         .col-action-btn-wishlist {
           color: rgba(245,237,224,0.35);
           border: 1px solid rgba(245,237,224,0.08) !important;
         }
-        .col-action-btn-wishlist:hover {
-          border-color: rgba(201,147,58,0.3) !important;
-          color: rgba(201,147,58,0.8);
-        }
+        .col-action-btn-wishlist:hover { border-color: rgba(201,147,58,0.3) !important; color: rgba(201,147,58,0.8); }
 
-        /* ── GRID ── */
+        /* ── BROWSE ALL GRID ── */
         .col-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 2px;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 3px;
         }
-
-        /* ── CARD ── */
         .col-card {
           position: relative; overflow: hidden;
           background: #100e0a; cursor: pointer;
+          aspect-ratio: 3/4;
         }
         .col-card.selected::after {
-          content: '';
-          position: absolute; inset: 0;
-          border: 2px solid #c9933a;
-          pointer-events: none; z-index: 3;
+          content: ''; position: absolute; inset: 0;
+          border: 2px solid #c9933a; pointer-events: none; z-index: 3;
         }
-
         .col-card-img {
-          width: 100%; height: 440px; object-fit: cover; display: block;
+          width: 100%; height: 100%; object-fit: cover; display: block;
           transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
         }
         .col-card:hover .col-card-img { transform: scale(1.06); }
-
         .col-card-placeholder {
-          width: 100%; height: 440px;
+          position: absolute; inset: 0;
           background: linear-gradient(160deg, #1a1208 0%, #0d0a06 100%);
           display: flex; align-items: center; justify-content: center;
-          position: relative; overflow: hidden;
-        }
-        .col-card-placeholder::before {
-          content: '';
-          position: absolute; inset: 0;
-          background: repeating-linear-gradient(
-            -45deg, transparent, transparent 20px,
-            rgba(201,147,58,0.02) 20px, rgba(201,147,58,0.02) 21px
-          );
         }
         .col-card-placeholder-text {
           font-family: 'Cormorant Garamond', serif;
-          font-weight: 700; font-size: 80px;
+          font-weight: 700; font-size: 64px;
           color: rgba(201,147,58,0.07); letter-spacing: -0.04em;
-          text-transform: uppercase; position: relative; z-index: 1;
+          text-transform: uppercase;
         }
-
-        .col-heart-btn {
-          position: absolute; top: 14px; right: 14px; z-index: 4;
-          width: 34px; height: 34px;
-          background: rgba(10,8,6,0.65);
-          border: 1px solid rgba(201,147,58,0.2);
+        .col-card-heart {
+          position: absolute; top: 12px; right: 12px; z-index: 4;
+          width: 30px; height: 30px;
+          background: rgba(10,8,6,0.65); border: 1px solid rgba(201,147,58,0.2);
           display: flex; align-items: center; justify-content: center;
-          cursor: pointer; transition: all 0.2s;
-          backdrop-filter: blur(4px);
+          cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px);
         }
-        .col-heart-btn:hover {
-          background: rgba(10,8,6,0.9); border-color: rgba(201,147,58,0.6);
-        }
-
+        .col-card-heart:hover { background: rgba(10,8,6,0.9); border-color: rgba(201,147,58,0.6); }
         .col-select-check {
-          position: absolute; top: 14px; left: 14px; z-index: 4;
-          width: 22px; height: 22px;
-          background: rgba(10,8,6,0.65);
-          border: 1px solid rgba(201,147,58,0.4);
+          position: absolute; top: 12px; left: 12px; z-index: 4;
+          width: 20px; height: 20px;
+          background: rgba(10,8,6,0.65); border: 1px solid rgba(201,147,58,0.4);
           display: flex; align-items: center; justify-content: center;
           cursor: pointer; transition: all 0.2s; color: #0a0806;
         }
         .col-select-check.checked { background: #c9933a; border-color: #c9933a; }
-
         .col-card-info {
           position: absolute; bottom: 0; left: 0; right: 0;
-          padding: 32px 22px 18px;
+          padding: 28px 16px 14px;
           background: linear-gradient(to top, rgba(10,8,6,0.97) 0%, transparent 100%);
           pointer-events: none;
         }
         .col-card-category {
-          font-size: 9px;
-          letter-spacing: 0.3em; text-transform: uppercase;
-          color: #c9933a; margin-bottom: 5px;
+          font-size: 8.5px; letter-spacing: 0.28em; text-transform: uppercase;
+          color: #c9933a; margin-bottom: 4px;
         }
         .col-card-name {
           font-family: 'Cormorant Garamond', serif;
-          font-weight: 500; font-size: 19px;
-          color: #f5ede0; letter-spacing: 0.04em;
-          margin-bottom: 3px; text-transform: uppercase;
+          font-weight: 500; font-size: 15px;
+          color: #f5ede0; letter-spacing: 0.03em;
+          margin-bottom: 2px; text-transform: uppercase;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .col-card-price {
-          font-size: 11px;
-          color: rgba(245,237,224,0.35); letter-spacing: 0.12em;
-        }
-
+        .col-card-price { font-size: 10.5px; color: rgba(245,237,224,0.32); letter-spacing: 0.1em; }
         .col-card-overlay {
           position: absolute; inset: 0;
           display: flex; flex-direction: column; justify-content: flex-end;
-          padding: 22px;
-          background: linear-gradient(to top, rgba(10,8,6,0.96) 0%, rgba(10,8,6,0.18) 55%, transparent 100%);
-          opacity: 0; transition: opacity 0.3s;
-          pointer-events: none;
+          padding: 16px;
+          background: linear-gradient(to top, rgba(10,8,6,0.95) 0%, rgba(10,8,6,0.15) 55%, transparent 100%);
+          opacity: 0; transition: opacity 0.3s; pointer-events: none;
         }
         .col-card:hover .col-card-overlay { opacity: 1; pointer-events: auto; }
-
-        @media (max-width: 768px) {
-          .col-card-overlay { opacity: 1; pointer-events: auto; }
-        }
-
-        .col-card-actions { display: flex; gap: 6px; margin-top: 60px; }
+        @media (max-width: 768px) { .col-card-overlay { opacity: 1; pointer-events: auto; } }
+        .col-card-actions { display: flex; gap: 4px; margin-top: 52px; }
         .col-card-btn {
-          flex: 1; padding: 10px 8px;
-          font-size: 9px; font-weight: 500;
-          letter-spacing: 0.2em; text-transform: uppercase;
+          flex: 1; padding: 9px 6px;
+          font-size: 8.5px; font-weight: 500;
+          letter-spacing: 0.16em; text-transform: uppercase;
           border: none; cursor: pointer;
-          display: flex; align-items: center; justify-content: center; gap: 6px;
+          display: flex; align-items: center; justify-content: center; gap: 5px;
           transition: all 0.2s;
         }
-        .col-card-btn-wa {
-          background: transparent; color: #c9933a;
-          border: 1px solid #c9933a;
-        }
+        .col-card-btn-wa { background: transparent; color: #c9933a; border: 1px solid #c9933a; }
         .col-card-btn-wa:hover { background: #c9933a; color: #0a0806; }
-        .col-card-btn-dm {
-          background: rgba(201,147,58,0.1); color: #c9933a;
-          border: 1px solid rgba(201,147,58,0.25);
-        }
-        .col-card-btn-dm:hover { opacity: 0.82; }
+        .col-card-btn-dm { background: rgba(201,147,58,0.08); color: #c9933a; border: 1px solid rgba(201,147,58,0.2); }
 
-        /* ── EMPTY STATE ── */
-        .col-empty {
-          grid-column: 1 / -1;
-          padding: 100px 0; text-align: center;
-        }
-        .col-empty-eyebrow {
-          font-size: 9px;
-          letter-spacing: 0.35em; text-transform: uppercase;
-          color: rgba(201,147,58,0.3); margin-bottom: 16px;
-        }
-        .col-empty-text {
-          font-family: 'Cormorant Garamond', serif;
-          font-weight: 300; font-style: italic; font-size: 22px;
-          color: rgba(245,237,224,0.15); letter-spacing: 0.06em;
-        }
+        /* ── EMPTY ── */
+        .col-empty { grid-column: 1/-1; padding: 80px 0; text-align: center; }
+        .col-empty-eyebrow { font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(201,147,58,0.3); margin-bottom: 12px; }
+        .col-empty-text { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; font-size: 20px; color: rgba(245,237,224,0.15); }
 
         /* ── BULK BAR ── */
         .col-bulk-bar {
           position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
-          background: #0d0a06;
-          border-top: 1px solid rgba(201,147,58,0.2);
+          background: #0d0a06; border-top: 1px solid rgba(201,147,58,0.2);
           padding: 18px 56px;
-          display: flex; align-items: center;
-          justify-content: space-between; gap: 16px;
+          display: flex; align-items: center; justify-content: space-between; gap: 16px;
           transform: translateY(100%);
           transition: transform 0.35s cubic-bezier(0.77,0,0.18,1);
         }
         .col-bulk-bar.visible { transform: translateY(0); }
-        .col-bulk-bar-left {
-          display: flex; align-items: center; gap: 14px;
-        }
-        .col-bulk-bar-dot {
-          width: 6px; height: 6px; border-radius: 50%;
-          background: #c9933a; flex-shrink: 0;
-        }
-        .col-bulk-bar-text {
-          font-family: 'Cormorant Garamond', serif;
-          font-weight: 400; font-size: 17px;
-          color: rgba(245,237,224,0.7); letter-spacing: 0.04em;
-        }
+        .col-bulk-bar-left { display: flex; align-items: center; gap: 14px; }
+        .col-bulk-bar-dot { width: 6px; height: 6px; border-radius: 50%; background: #c9933a; flex-shrink: 0; }
+        .col-bulk-bar-text { font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: 17px; color: rgba(245,237,224,0.7); }
         .col-bulk-bar-text span { color: #c9933a; font-weight: 600; }
         .col-bulk-actions { display: flex; gap: 10px; }
-        .col-bulk-btn {
-          font-size: 9px; font-weight: 500;
-          letter-spacing: 0.22em; text-transform: uppercase;
-          padding: 12px 28px; border: none; cursor: pointer;
-          transition: all 0.2s; white-space: nowrap;
-        }
-        .col-bulk-btn-wa {
-          background: transparent; color: #c9933a;
-          border: 1px solid #c9933a;
-          display: flex; align-items: center; gap: 8px;
-        }
+        .col-bulk-btn { font-size: 9px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; padding: 12px 28px; border: none; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .col-bulk-btn-wa { background: transparent; color: #c9933a; border: 1px solid #c9933a; display: flex; align-items: center; gap: 8px; }
         .col-bulk-btn-wa:hover { background: #c9933a; color: #0a0806; }
-        .col-bulk-btn-clear {
-          background: transparent; color: rgba(245,237,224,0.3);
-          border: 1px solid rgba(245,237,224,0.08);
-        }
-        .col-bulk-btn-clear:hover { opacity: 0.85; }
+        .col-bulk-btn-clear { background: transparent; color: rgba(245,237,224,0.3); border: 1px solid rgba(245,237,224,0.08); }
 
         /* ── VIEW MODAL ── */
         .col-view-backdrop {
           position: fixed; inset: 0; z-index: 200;
-          background: rgba(5,4,3,0.92);
-          backdrop-filter: blur(8px);
+          background: rgba(5,4,3,0.92); backdrop-filter: blur(8px);
           display: flex; align-items: center; justify-content: center;
-          padding: 32px;
-          animation: colFadeIn 0.25s ease;
+          padding: 32px; animation: colFadeIn 0.25s ease;
         }
         @keyframes colFadeIn { from { opacity: 0; } to { opacity: 1; } }
-
         .col-view-modal {
           width: 100%; max-width: 980px; max-height: 88vh;
-          background: #0d0a06;
-          border: 1px solid rgba(201,147,58,0.18);
-          display: grid;
-          grid-template-columns: 1.1fr 1fr;
-          overflow: hidden;
+          background: #0d0a06; border: 1px solid rgba(201,147,58,0.18);
+          display: grid; grid-template-columns: 1.1fr 1fr;
+          overflow: hidden; position: relative;
           animation: colSlideUp 0.35s cubic-bezier(0.16,1,0.3,1);
-          position: relative;
         }
-        @keyframes colSlideUp {
-          from { opacity: 0; transform: translateY(24px) scale(0.98); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
+        @keyframes colSlideUp { from { opacity:0; transform:translateY(24px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
         .col-view-close {
           position: absolute; top: 16px; right: 16px; z-index: 10;
           width: 38px; height: 38px;
-          background: rgba(10,8,6,0.85);
-          border: 1px solid rgba(201,147,58,0.3);
-          color: #f5ede0;
-          display: flex; align-items: center; justify-content: center;
-          cursor: pointer; transition: all 0.2s;
-          backdrop-filter: blur(4px);
+          background: rgba(10,8,6,0.85); border: 1px solid rgba(201,147,58,0.3);
+          color: #f5ede0; display: flex; align-items: center; justify-content: center;
+          cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px);
         }
-        .col-view-close:hover { border-color: #c9933a; background: rgba(10,8,6,0.95); }
-
-        .col-view-imgwrap {
-          position: relative;
-          background: #100e0a;
-          display: flex; flex-direction: column;
-          overflow: hidden;
-        }
-        .col-view-img-main {
-          width: 100%; flex: 1;
-          object-fit: cover; display: block;
-          min-height: 320px; max-height: 560px;
-        }
-        .col-view-img-placeholder {
-          width: 100%; flex: 1; min-height: 320px;
-          background: linear-gradient(160deg, #1a1208 0%, #0d0a06 100%);
-          display: flex; align-items: center; justify-content: center;
-        }
-        .col-view-img-placeholder span {
-          font-family: 'Cormorant Garamond', serif;
-          font-weight: 700; font-size: 90px;
-          color: rgba(201,147,58,0.08); letter-spacing: -0.04em;
-        }
-        .col-view-thumbs {
-          display: flex; gap: 6px; padding: 12px;
-          background: #0a0806;
-          overflow-x: auto;
-          flex-shrink: 0;
-        }
-        .col-view-thumb {
-          width: 56px; height: 56px; flex-shrink: 0;
-          object-fit: cover; cursor: pointer;
-          opacity: 0.45; transition: opacity 0.2s, border-color 0.2s;
-          border: 1px solid transparent;
-        }
+        .col-view-close:hover { border-color: #c9933a; }
+        .col-view-imgwrap { position: relative; background: #100e0a; display: flex; flex-direction: column; overflow: hidden; }
+        .col-view-img-main { width: 100%; flex: 1; object-fit: cover; display: block; min-height: 320px; max-height: 560px; }
+        .col-view-img-placeholder { width: 100%; flex: 1; min-height: 320px; background: linear-gradient(160deg,#1a1208,#0d0a06); display: flex; align-items: center; justify-content: center; }
+        .col-view-img-placeholder span { font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 90px; color: rgba(201,147,58,0.08); }
+        .col-view-thumbs { display: flex; gap: 6px; padding: 12px; background: #0a0806; overflow-x: auto; flex-shrink: 0; }
+        .col-view-thumb { width: 56px; height: 56px; flex-shrink: 0; object-fit: cover; cursor: pointer; opacity: 0.45; transition: opacity 0.2s; border: 1px solid transparent; }
         .col-view-thumb:hover { opacity: 0.8; }
         .col-view-thumb.active { opacity: 1; border-color: #c9933a; }
-
-        .col-view-body {
-          padding: 40px 36px;
-          display: flex; flex-direction: column;
-          overflow-y: auto;
-          -webkit-overflow-scrolling: touch;
-        }
-        .col-view-category {
-          font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
-          color: #c9933a; margin-bottom: 14px;
-        }
-        .col-view-name {
-          font-family: 'Cormorant Garamond', serif;
-          font-weight: 500; font-size: 32px;
-          color: #f5ede0; text-transform: uppercase;
-          letter-spacing: 0.02em; line-height: 1.1; margin-bottom: 14px;
-        }
-        .col-view-price {
-          font-family: 'Cormorant Garamond', serif;
-          font-weight: 400; font-size: 22px;
-          color: #c9933a; margin-bottom: 24px;
-        }
-        .col-view-divider {
-          width: 36px; height: 1px; background: rgba(201,147,58,0.3);
-          margin-bottom: 24px; flex-shrink: 0;
-        }
-        .col-view-label {
-          font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
-          color: rgba(245,237,224,0.3); margin-bottom: 8px;
-        }
-        .col-view-desc {
-          font-family: 'Barlow', sans-serif;
-          font-size: 13.5px; line-height: 1.8;
-          color: rgba(245,237,224,0.55);
-          margin-bottom: 24px;
-        }
-        .col-view-enquire {
-          width: 100%; padding: 14px;
-          background: transparent; color: #c9933a;
-          border: 1px solid #c9933a; cursor: pointer;
-          font-family: 'Barlow', sans-serif;
-          font-size: 9px; font-weight: 500;
-          letter-spacing: 0.22em; text-transform: uppercase;
-          display: flex; align-items: center; justify-content: center; gap: 8px;
-          transition: all 0.2s; flex-shrink: 0; margin-bottom: 20px;
-        }
+        .col-view-body { padding: 40px 36px; display: flex; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .col-view-category { font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase; color: #c9933a; margin-bottom: 14px; }
+        .col-view-name { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 32px; color: #f5ede0; text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.1; margin-bottom: 14px; }
+        .col-view-price { font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: 22px; color: #c9933a; margin-bottom: 24px; }
+        .col-view-divider { width: 36px; height: 1px; background: rgba(201,147,58,0.3); margin-bottom: 24px; flex-shrink: 0; }
+        .col-view-label { font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(245,237,224,0.3); margin-bottom: 8px; }
+        .col-view-desc { font-family: 'Barlow', sans-serif; font-size: 13.5px; line-height: 1.8; color: rgba(245,237,224,0.55); margin-bottom: 24px; }
+        .col-view-enquire { width: 100%; padding: 14px; background: transparent; color: #c9933a; border: 1px solid #c9933a; cursor: pointer; font-family: 'Barlow', sans-serif; font-size: 9px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; flex-shrink: 0; margin-bottom: 20px; }
         .col-view-enquire:hover { background: #c9933a; color: #0a0806; }
-        .col-view-meta {
-          display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
-          padding-top: 20px;
-          border-top: 1px solid rgba(201,147,58,0.1);
-          flex-shrink: 0;
-        }
-        .col-view-meta-label {
-          font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
-          color: rgba(245,237,224,0.25); margin-bottom: 4px;
-        }
-        .col-view-meta-value {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 15px; color: rgba(245,237,224,0.75);
-        }
+        .col-view-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding-top: 20px; border-top: 1px solid rgba(201,147,58,0.1); flex-shrink: 0; }
+        .col-view-meta-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(245,237,224,0.25); margin-bottom: 4px; }
+        .col-view-meta-value { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: rgba(245,237,224,0.75); }
 
-        /* ── RESPONSIVE ── */
+        /* ══ RESPONSIVE ══ */
         @media (max-width: 900px) {
-          .col-root        { padding: 100px 24px 100px; }
-          .col-top-line    { left: 24px; right: 24px; }
-          .col-grid        { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-          .col-card-img    { height: 360px; }
-          .col-card-placeholder { height: 360px; }
-          .col-header      { flex-direction: column; align-items: flex-start; margin-bottom: 36px; }
-          .col-toolbar     { justify-content: flex-start; }
-          .col-bulk-bar    { padding: 14px 24px; flex-direction: column; align-items: flex-start; gap: 12px; }
-          .col-bulk-actions{ width: 100%; }
-          .col-bulk-btn    { flex: 1; text-align: center; justify-content: center; }
+          .col-root { padding: 100px 16px 80px; }
+          .col-top-line { left: 16px; right: 16px; }
+          .col-header { flex-direction: column; align-items: flex-start; }
+          .col-toolbar { justify-content: flex-start; }
+          .col-bulk-bar { padding: 14px 16px; flex-direction: column; align-items: flex-start; gap: 10px; }
+          .col-bulk-actions { width: 100%; }
+          .col-bulk-btn { flex: 1; text-align: center; justify-content: center; }
+          .hs-feat-card { width: 280px; }
+          .hs-feat-img, .hs-feat-ph { height: 360px; }
+          .hs-new-grid {
+            grid-template-rows: repeat(3, 90px);
+            grid-auto-columns: 90px;
+          }
+          .hs-mv-card { width: 190px; }
+          .hs-mv-img, .hs-mv-ph { height: 250px; }
+          .col-grid { grid-template-columns: 1fr 1fr; gap: 3px; }
         }
 
-        /* ── MOBILE MODAL FIXES ── */
         @media (max-width: 768px) {
-          .col-view-backdrop {
-            padding: 0;
-            align-items: flex-end;
-          }
-          .col-view-modal {
-            grid-template-columns: 1fr;
-            grid-template-rows: auto 1fr;
-            max-height: 95vh;
-            max-width: 100%;
-            width: 100%;
-            border-left: none;
-            border-right: none;
-            border-bottom: none;
-            border-radius: 0;
-          }
-          /* image section — fixed height so body gets the rest */
-          .col-view-imgwrap {
-            max-height: 42vh;
-            flex-shrink: 0;
-          }
-          .col-view-img-main {
-            min-height: 0;
-            max-height: 36vh;
-            height: 36vh;
-          }
-          .col-view-img-placeholder {
-            min-height: 0;
-            height: 36vh;
-          }
-          /* body section scrolls freely */
-          .col-view-body {
-            padding: 24px 20px 36px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            flex: 1;
-          }
-          .col-view-name { font-size: 24px; }
-          .col-view-price { font-size: 18px; margin-bottom: 18px; }
-          .col-view-desc { font-size: 13px; margin-bottom: 18px; }
-          /* enquire button always visible on mobile */
-          .col-view-enquire { margin-bottom: 18px; }
-          .col-view-meta { gap: 12px; }
-          .col-view-meta-value { font-size: 13.5px; }
+          .col-view-backdrop { padding: 0; align-items: flex-end; }
+          .col-view-modal { grid-template-columns: 1fr; grid-template-rows: auto 1fr; max-height: 95vh; max-width: 100%; width: 100%; }
+          .col-view-imgwrap { max-height: 42vh; flex-shrink: 0; }
+          .col-view-img-main { min-height: 0; max-height: 36vh; height: 36vh; }
+          .col-view-img-placeholder { min-height: 0; height: 36vh; }
+          .col-view-body { padding: 22px 18px 32px; overflow-y: auto; flex: 1; }
+          .col-view-name { font-size: 22px; }
+          .col-view-price { font-size: 18px; margin-bottom: 16px; }
+          .col-view-desc { font-size: 13px; margin-bottom: 16px; }
+          .col-view-enquire { margin-bottom: 16px; }
+          .col-view-meta { gap: 10px; }
+          .col-view-meta-value { font-size: 13px; }
         }
 
         @media (max-width: 480px) {
-          .col-grid { grid-template-columns: 1fr; }
-          .col-view-img-main { height: 30vh; max-height: 30vh; }
-          .col-view-img-placeholder { height: 30vh; }
-          .col-view-body { padding: 20px 16px 32px; }
-          .col-view-name { font-size: 22px; }
+          .hs-feat-card { width: 240px; }
+          .hs-feat-img, .hs-feat-ph { height: 300px; }
+          .hs-new-grid {
+            grid-template-rows: repeat(3, 76px);
+            grid-auto-columns: 76px;
+          }
+          .col-grid { grid-template-columns: 1fr 1fr; }
+          .col-view-img-main { height: 28vh; max-height: 28vh; }
+          .col-view-img-placeholder { height: 28vh; }
+          .col-view-body { padding: 18px 14px 28px; }
+          .col-view-name { font-size: 20px; }
         }
       `}</style>
 
       <section id="collections" className="col-root">
         <div className="col-top-line" />
 
-        <div className="col-header">
-          <div>
-            <div className="col-eyebrow">
-              <div className="col-eyebrow-line" />
-              <span>The Collection</span>
-            </div>
-            <h2 className="col-title">Our <em>Pieces</em></h2>
-          </div>
-
-          <div className="col-toolbar">
-            <div className="col-filters">
-              {filters.map(f => (
-                <button
-                  key={f}
-                  className={`col-filter-btn${activeFilter === f ? ' active' : ''}`}
-                  onClick={() => setActiveFilter(f)}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-            <div className="col-toolbar-sep" />
-            <button
-              className={`col-action-btn col-action-btn-select${selectMode ? ' active' : ''}`}
-              onClick={() => { setSelectMode(!selectMode); setSelected([]) }}
-            >
-              {selectMode ? <><CloseIcon /> Cancel</> : <><CheckIcon /> Select</>}
-            </button>
-            <button
-              className="col-action-btn col-action-btn-wishlist"
-              onClick={() => navigate('/wishlist')}
-            >
-              <HeartIcon filled={false} /> Saved{wishlist.length > 0 ? ` (${wishlist.length})` : ''}
-            </button>
-          </div>
-        </div>
-
         {loading ? (
-          <div className="col-grid">
+          <div className="col-grid" style={{ marginTop: 40 }}>
             {[...Array(6)].map((_, i) => (
-              <div key={i} style={{ height: 440, background: 'linear-gradient(160deg,#1a1208,#0d0a06)', opacity: 0.4 + i * 0.04 }} />
+              <div key={i} style={{ aspectRatio:'3/4', background:'linear-gradient(160deg,#1a1208,#0d0a06)', opacity: 0.4 + i * 0.04 }} />
             ))}
           </div>
         ) : (
-          <div className="col-grid">
-            {filtered.length === 0 ? (
-              <div className="col-empty">
-                <div className="col-empty-eyebrow">The Bills</div>
-                <div className="col-empty-text">No pieces available yet — check back soon.</div>
-              </div>
-            ) : (
-              filtered.map(product => (
-                <div
-                  key={product._id}
-                  className={`col-card${selected.includes(product._id) ? ' selected' : ''}`}
-                  onClick={() => selectMode ? toggleSelect(product._id) : openView(product)}
-                >
-                  <button className="col-heart-btn" onClick={e => { e.stopPropagation(); toggleWishlist(product._id) }}>
-                    <HeartIcon filled={wishlist.includes(product._id)} />
-                  </button>
-
-                  {selectMode && (
-                    <div className={`col-select-check${selected.includes(product._id) ? ' checked' : ''}`}>
-                      {selected.includes(product._id) && <CheckIcon />}
-                    </div>
-                  )}
-
-                  {product.images?.[0] ? (
-                    <img src={product.images[0]} alt={product.name} className="col-card-img" />
-                  ) : (
-                    <div className="col-card-placeholder">
-                      <span className="col-card-placeholder-text">TB</span>
-                    </div>
-                  )}
-
-                  <div className="col-card-info">
-                    <div className="col-card-category">{product.category}</div>
-                    <div className="col-card-name">{product.name}</div>
-                    <div className="col-card-price">{product.price}</div>
+          <>
+            {/* ══ FEATURED ══ */}
+            {featured.length > 0 && (
+              <div>
+                <div className="col-sec-head">
+                  <div>
+                    <div className="col-eyebrow"><div className="col-eyebrow-line" /><span>Hand Picked</span></div>
+                    <h2 className="col-title">Featured <em>Pieces</em></h2>
                   </div>
-
-                  {!selectMode && (
-                    <div className="col-card-overlay">
-                      <div className="col-card-actions">
-                        <button className="col-card-btn col-card-btn-wa" onClick={e => { e.stopPropagation(); handleWhatsApp(product) }}>
-                          <WhatsAppIcon /> WhatsApp
-                        </button>
-                        <button className="col-card-btn col-card-btn-dm" onClick={e => { e.stopPropagation(); window.open(settings?.instagram || '#', '_blank') }}>
-                          DM Us
-                        </button>
+                </div>
+                <div className="hs-featured-wrap">
+                  {featured.map(product => (
+                    <div key={product._id} className="hs-feat-card" onClick={() => openView(product)}>
+                      <button className="col-heart-btn" onClick={e => { e.stopPropagation(); toggleWishlist(product._id) }}>
+                        <HeartIcon filled={wishlist.includes(product._id)} />
+                      </button>
+                      <div className="hs-feat-badge">Featured</div>
+                      {product.images?.[0]
+                        ? <img src={product.images[0]} alt={product.name} className="hs-feat-img" />
+                        : <div className="hs-feat-ph"><span>TB</span></div>
+                      }
+                      <div className="hs-feat-info">
+                        <div className="hs-feat-cat">{product.category}</div>
+                        <div className="hs-feat-name">{product.name}</div>
+                        <div className="hs-feat-price">{product.price}</div>
                       </div>
                     </div>
-                  )}
+                  ))}
                 </div>
-              ))
+                <div className="col-sec-divider" />
+              </div>
             )}
-          </div>
+
+            {/* ══ NEW ARRIVALS — 3-row horizontal tiles, no text ══ */}
+            {newArrivals.length > 0 && (
+              <div>
+                <div className="col-sec-head">
+                  <div>
+                    <div className="col-eyebrow"><div className="col-eyebrow-line" /><span>Just Dropped</span></div>
+                    <h2 className="col-title">New <em>Arrivals</em></h2>
+                  </div>
+                </div>
+                <div className="hs-new-scroll">
+                  <div className="hs-new-grid">
+                    {newArrivals.map(product => (
+                      <div key={product._id} className="hs-new-tile" onClick={() => openView(product)}>
+                        {product.images?.[0]
+                          ? <img src={product.images[0]} alt={product.name} />
+                          : <div className="hs-new-tile-ph"><span>TB</span></div>
+                        }
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="col-sec-divider" />
+              </div>
+            )}
+
+            {/* ══ MOST VIEWED ══ */}
+            {mostViewed.length > 0 && (
+              <div>
+                <div className="col-sec-head">
+                  <div>
+                    <div className="col-eyebrow"><div className="col-eyebrow-line" /><span>Trending Now</span></div>
+                    <h2 className="col-title">Most <em>Viewed</em></h2>
+                  </div>
+                </div>
+                <div className="hs-mv-wrap">
+                  {mostViewed.map(product => (
+                    <div key={product._id} className="hs-mv-card" onClick={() => openView(product)}>
+                      <button className="col-heart-btn" onClick={e => { e.stopPropagation(); toggleWishlist(product._id) }}>
+                        <HeartIcon filled={wishlist.includes(product._id)} />
+                      </button>
+                      {product.images?.[0]
+                        ? <img src={product.images[0]} alt={product.name} className="hs-mv-img" />
+                        : <div className="hs-mv-ph"><span>TB</span></div>
+                      }
+                      <div className="hs-mv-info">
+                        <div className="hs-mv-cat">{product.category}</div>
+                        <div className="hs-mv-name">{product.name}</div>
+                        <div className="hs-mv-price">{product.price}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="col-sec-divider" />
+              </div>
+            )}
+
+            {/* ══ BROWSE ALL ══ */}
+            <div>
+              <div className="col-header">
+                <div>
+                  <div className="col-eyebrow"><div className="col-eyebrow-line" /><span>The Collection</span></div>
+                  <h2 className="col-title">Browse <em>All</em></h2>
+                </div>
+                <div className="col-toolbar">
+                  <div className="col-filters">
+                    {filters.map(f => (
+                      <button key={f} className={`col-filter-btn${activeFilter === f ? ' active' : ''}`} onClick={() => setActiveFilter(f)}>{f}</button>
+                    ))}
+                  </div>
+                  <div className="col-toolbar-sep" />
+                  <button className={`col-action-btn col-action-btn-select${selectMode ? ' active' : ''}`} onClick={() => { setSelectMode(!selectMode); setSelected([]) }}>
+                    {selectMode ? <><CloseIcon /> Cancel</> : <><CheckIcon /> Select</>}
+                  </button>
+                  <button className="col-action-btn col-action-btn-wishlist" onClick={() => navigate('/wishlist')}>
+                    <HeartIcon filled={false} /> Saved{wishlist.length > 0 ? ` (${wishlist.length})` : ''}
+                  </button>
+                </div>
+              </div>
+
+              <div className="col-grid">
+                {filtered.length === 0 ? (
+                  <div className="col-empty">
+                    <div className="col-empty-eyebrow">The Bills</div>
+                    <div className="col-empty-text">No pieces available yet — check back soon.</div>
+                  </div>
+                ) : (
+                  filtered.map(product => (
+                    <div
+                      key={product._id}
+                      className={`col-card${selected.includes(product._id) ? ' selected' : ''}`}
+                      onClick={() => selectMode ? toggleSelect(product._id) : openView(product)}
+                    >
+                      <button className="col-card-heart" onClick={e => { e.stopPropagation(); toggleWishlist(product._id) }}>
+                        <HeartIcon filled={wishlist.includes(product._id)} />
+                      </button>
+                      {selectMode && (
+                        <div className={`col-select-check${selected.includes(product._id) ? ' checked' : ''}`}>
+                          {selected.includes(product._id) && <CheckIcon />}
+                        </div>
+                      )}
+                      {product.images?.[0]
+                        ? <img src={product.images[0]} alt={product.name} className="col-card-img" />
+                        : <div className="col-card-placeholder"><span className="col-card-placeholder-text">TB</span></div>
+                      }
+                      <div className="col-card-info">
+                        <div className="col-card-category">{product.category}</div>
+                        <div className="col-card-name">{product.name}</div>
+                        <div className="col-card-price">{product.price}</div>
+                      </div>
+                      {!selectMode && (
+                        <div className="col-card-overlay">
+                          <div className="col-card-actions">
+                            <button className="col-card-btn col-card-btn-wa" onClick={e => { e.stopPropagation(); handleWhatsApp(product) }}>
+                              <WhatsAppIcon /> WhatsApp
+                            </button>
+                            <button className="col-card-btn col-card-btn-dm" onClick={e => { e.stopPropagation(); window.open(settings?.instagram || '#', '_blank') }}>
+                              DM Us
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </>
         )}
       </section>
 
+      {/* Bulk bar */}
       <div className={`col-bulk-bar${selected.length > 0 ? ' visible' : ''}`}>
         <div className="col-bulk-bar-left">
           <div className="col-bulk-bar-dot" />
@@ -703,17 +734,16 @@ export default function Collections({ settings }) {
         </div>
       </div>
 
+      {/* View modal */}
       {viewProduct && (
         <div className="col-view-backdrop" onClick={e => e.target === e.currentTarget && closeView()}>
           <div className="col-view-modal">
             <button className="col-view-close" onClick={closeView}><CloseIcon /></button>
-
             <div className="col-view-imgwrap">
-              {viewProduct.images?.[activeImg] ? (
-                <img src={viewProduct.images[activeImg]} alt={viewProduct.name} className="col-view-img-main" />
-              ) : (
-                <div className="col-view-img-placeholder"><span>TB</span></div>
-              )}
+              {viewProduct.images?.[activeImg]
+                ? <img src={viewProduct.images[activeImg]} alt={viewProduct.name} className="col-view-img-main" />
+                : <div className="col-view-img-placeholder"><span>TB</span></div>
+              }
               {viewProduct.images?.length > 1 && (
                 <div className="col-view-thumbs">
                   {viewProduct.images.map((img, i) => (
@@ -722,18 +752,14 @@ export default function Collections({ settings }) {
                 </div>
               )}
             </div>
-
             <div className="col-view-body">
               <div className="col-view-category">{viewProduct.category}</div>
               <div className="col-view-name">{viewProduct.name}</div>
               <div className="col-view-price">{viewProduct.price}</div>
               {viewProduct.vendor && (
-                <div
-                  onClick={() => navigate(`/shop/${viewProduct.vendor._id}`)}
-                  style={{ fontSize: 11, color: 'rgba(245,237,224,0.4)', marginBottom: 16, letterSpacing: '0.05em', cursor: 'pointer' }}
-                >
-                  Sold by <span style={{ color: '#c9933a', fontWeight: 600, textDecoration: 'underline' }}>{viewProduct.vendor.shopName}</span>
-                  {viewProduct.vendor.verified && <span style={{ marginLeft: 6 }}>✓</span>}
+                <div onClick={() => navigate(`/shop/${viewProduct.vendor._id}`)} style={{ fontSize:11, color:'rgba(245,237,224,0.4)', marginBottom:16, letterSpacing:'0.05em', cursor:'pointer' }}>
+                  Sold by <span style={{ color:'#c9933a', fontWeight:600, textDecoration:'underline' }}>{viewProduct.vendor.shopName}</span>
+                  {viewProduct.vendor.verified && <span style={{ marginLeft:6 }}>✓</span>}
                 </div>
               )}
               <div className="col-view-divider" />
@@ -743,11 +769,11 @@ export default function Collections({ settings }) {
                 <WhatsAppIcon /> Enquire on This Piece
               </button>
               <div className="col-view-meta">
-                <div className="col-view-meta-item">
+                <div>
                   <div className="col-view-meta-label">Category</div>
                   <div className="col-view-meta-value">{viewProduct.category || '—'}</div>
                 </div>
-                <div className="col-view-meta-item">
+                <div>
                   <div className="col-view-meta-label">Collection</div>
                   <div className="col-view-meta-value">{viewProduct.collection || '—'}</div>
                 </div>

@@ -17,6 +17,7 @@ import {
   getAllVendors, updateVendorStatus, toggleVendorVerified, deleteVendor,  updateVendorProfile, changeVendorPassword,
 
 } from '../controllers/vendorController.js'
+import { createReview, getProductReviews, getAllReviews, deleteReview } from '../controllers/reviewController.js'
 
 const router = express.Router()
 
@@ -73,5 +74,11 @@ router.delete('/collections/:id', protect, deleteCollection)
 // ─── SETTINGS ─────────────────────────────────────────
 router.get('/settings', getSettings)
 router.put('/settings', protect, updateSettings)
+
+// ─── REVIEWS ──────────────────────────────────────────
+router.post('/reviews', createReview)
+router.get('/reviews/:productId', getProductReviews)
+router.get('/reviews', protect, getAllReviews)
+router.delete('/reviews/:id', protect, deleteReview)
 
 export default router
