@@ -35,8 +35,8 @@ const StarIcon = ({ filled, half }) => (
 
 function Stars({ rating, size = 14 }) {
   return (
-    <div style={{ display:'flex', gap:2 }}>
-      {[1,2,3,4,5].map(i => (
+    <div style={{ display: 'flex', gap: 2 }}>
+      {[1, 2, 3, 4, 5].map(i => (
         <svg key={i} width={size} height={size} viewBox="0 0 24 24" fill={i <= rating ? '#c9933a' : 'none'} stroke="#c9933a" strokeWidth="1.5">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
@@ -65,29 +65,29 @@ function ScrollProgress({ scrollRef }) {
 }
 
 export default function Collections({ settings }) {
-  const [products, setProducts]         = useState([])
-  const [collections, setCollections]   = useState([])
+  const [products, setProducts] = useState([])
+  const [collections, setCollections] = useState([])
   const [activeFilter, setActiveFilter] = useState('All')
-  const [loading, setLoading]           = useState(true)
-  const [selected, setSelected]         = useState([])
-  const [wishlist, setWishlist]         = useState([])
-  const [selectMode, setSelectMode]     = useState(false)
-  const [viewProduct, setViewProduct]   = useState(null)
-  const [activeImg, setActiveImg]       = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [selected, setSelected] = useState([])
+  const [wishlist, setWishlist] = useState([])
+  const [selectMode, setSelectMode] = useState(false)
+  const [viewProduct, setViewProduct] = useState(null)
+  const [activeImg, setActiveImg] = useState(0)
 
   // Reviews state
-  const [reviews, setReviews]           = useState([])
+  const [reviews, setReviews] = useState([])
   const [reviewsLoading, setReviewsLoading] = useState(false)
-  const [reviewAvg, setReviewAvg]       = useState(0)
+  const [reviewAvg, setReviewAvg] = useState(0)
   const [showReviewForm, setShowReviewForm] = useState(false)
-  const [reviewForm, setReviewForm]     = useState({ name:'', rating:5, comment:'' })
+  const [reviewForm, setReviewForm] = useState({ name: '', rating: 5, comment: '' })
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewSuccess, setReviewSuccess] = useState(false)
-  const [reviewError, setReviewError]   = useState('')
+  const [reviewError, setReviewError] = useState('')
 
   const featRef = useRef(null)
-  const mvRef   = useRef(null)
-  const newRef  = useRef(null)
+  const mvRef = useRef(null)
+  const newRef = useRef(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -114,11 +114,11 @@ export default function Collections({ settings }) {
       .finally(() => setReviewsLoading(false))
   }, [viewProduct])
 
-  const filters     = ['All', ...collections.map(c => c.name)]
-  const filtered    = activeFilter === 'All' ? products : products.filter(p => p.collection === activeFilter)
-  const featured    = products.filter(p => p.featured)
+  const filters = ['All', ...collections.map(c => c.name)]
+  const filtered = activeFilter === 'All' ? products : products.filter(p => p.collection === activeFilter)
+  const featured = products.filter(p => p.featured)
   const newArrivals = [...products].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 12)
-  const mostViewed  = [...products].sort((a, b) => (b.views || 0) - (a.views || 0)).filter(p => (p.views || 0) > 0).slice(0, 10)
+  const mostViewed = [...products].sort((a, b) => (b.views || 0) - (a.views || 0)).filter(p => (p.views || 0) > 0).slice(0, 10)
 
   const toggleWishlist = (id) => {
     const updated = wishlist.includes(id) ? wishlist.filter(w => w !== id) : [...wishlist, id]
@@ -137,8 +137,8 @@ export default function Collections({ settings }) {
 
   const handleBulkEnquire = () => {
     const items = products.filter(p => selected.includes(p._id))
-    const list  = items.map((p, i) => `${i + 1}. *${p.name}* — ${p.price}`).join('\n')
-    const msg   = `Hello The Bills!\n\nI'm interested in the following pieces:\n\n${list}\n\nPlease provide more details. Thank you!`
+    const list = items.map((p, i) => `${i + 1}. *${p.name}* — ${p.price}`).join('\n')
+    const msg = `Hello The Bills!\n\nI'm interested in the following pieces:\n\n${list}\n\nPlease provide more details. Thank you!`
     window.open(`https://wa.me/${settings?.whatsapp || '233546805804'}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
@@ -152,12 +152,12 @@ export default function Collections({ settings }) {
       await submitReview({ product: viewProduct._id, ...reviewForm })
       setReviewSuccess(true)
       setShowReviewForm(false)
-      setReviewForm({ name:'', rating:5, comment:'' })
+      setReviewForm({ name: '', rating: 5, comment: '' })
       // Reload reviews
       const data = await fetchProductReviews(viewProduct._id)
       setReviews(data.data || [])
       setReviewAvg(data.avg || 0)
-    } catch(e) { setReviewError(e.response?.data?.error || 'Failed to submit review.') }
+    } catch (e) { setReviewError(e.response?.data?.error || 'Failed to submit review.') }
     finally { setReviewSubmitting(false) }
   }
 
@@ -305,8 +305,7 @@ export default function Collections({ settings }) {
         /* VIEW MODAL */
         .col-view-backdrop { position: fixed; inset: 0; z-index: 200; background: rgba(5,4,3,0.92); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 32px; animation: colFadeIn 0.25s ease; }
         @keyframes colFadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .col-view-modal { width: 100%; max-width: 980px; max-height: 88vh; background: #0d0a06; border: 1px solid rgba(201,147,58,0.18); display: grid; grid-template-columns: 1.1fr 1fr; overflow: hidden; position: relative; animation: colSlideUp 0.35s cubic-bezier(0.16,1,0.3,1); }
-        @keyframes colSlideUp { from { opacity:0; transform:translateY(24px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
+.col-view-modal { width: 100%; max-width: 980px; max-height: 88vh; background: #0d0a06; border: 1px solid rgba(201,147,58,0.18); display: grid; grid-template-columns: 1.1fr 1fr; overflow: visible; position: relative; animation: colSlideUp 0.35s cubic-bezier(0.16,1,0.3,1); }        @keyframes colSlideUp { from { opacity:0; transform:translateY(24px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
         .col-view-close { position: absolute; top: 16px; right: 16px; z-index: 10; width: 38px; height: 38px; background: rgba(10,8,6,0.85); border: 1px solid rgba(201,147,58,0.3); color: #f5ede0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px); }
         .col-view-close:hover { border-color: #c9933a; }
         .col-view-imgwrap { position: relative; background: #100e0a; display: flex; flex-direction: column; overflow: hidden; }
@@ -317,8 +316,8 @@ export default function Collections({ settings }) {
         .col-view-thumb { width: 56px; height: 56px; flex-shrink: 0; object-fit: cover; cursor: pointer; opacity: 0.45; transition: opacity 0.2s; border: 1px solid transparent; }
         .col-view-thumb:hover { opacity: 0.8; }
         .col-view-thumb.active { opacity: 1; border-color: #c9933a; }
-        .col-view-body { padding: 32px 28px; display: flex; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .col-view-category { font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase; color: #c9933a; margin-bottom: 10px; }
+        .col-view-body { padding: 32px 28px; display: flex; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; max-height: 88vh; scrollbar-width: none; -ms-overflow-style: none; }   
+        .col-view-body::-webkit-scrollbar { display: none; }                                              
         .col-view-name { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 28px; color: #f5ede0; text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.1; margin-bottom: 10px; }
         .col-view-price { font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: 20px; color: #c9933a; margin-bottom: 16px; }
         .col-view-divider { width: 36px; height: 1px; background: rgba(201,147,58,0.3); margin-bottom: 16px; flex-shrink: 0; }
@@ -417,7 +416,7 @@ export default function Collections({ settings }) {
         {loading ? (
           <div className="col-grid" style={{ marginTop: 40 }}>
             {[...Array(6)].map((_, i) => (
-              <div key={i} style={{ aspectRatio:'3/4', background:'linear-gradient(160deg,#1a1208,#0d0a06)', opacity: 0.4 + i * 0.04 }} />
+              <div key={i} style={{ aspectRatio: '3/4', background: 'linear-gradient(160deg,#1a1208,#0d0a06)', opacity: 0.4 + i * 0.04 }} />
             ))}
           </div>
         ) : (
@@ -613,9 +612,9 @@ export default function Collections({ settings }) {
               <div className="col-view-name">{viewProduct.name}</div>
               <div className="col-view-price">{viewProduct.price}</div>
               {viewProduct.vendor && (
-                <div onClick={() => navigate(`/shop/${viewProduct.vendor._id}`)} style={{ fontSize:11, color:'rgba(245,237,224,0.4)', marginBottom:12, letterSpacing:'0.05em', cursor:'pointer' }}>
-                  Sold by <span style={{ color:'#c9933a', fontWeight:600, textDecoration:'underline' }}>{viewProduct.vendor.shopName}</span>
-                  {viewProduct.vendor.verified && <span style={{ marginLeft:6 }}>✓</span>}
+                <div onClick={() => navigate(`/shop/${viewProduct.vendor._id}`)} style={{ fontSize: 11, color: 'rgba(245,237,224,0.4)', marginBottom: 12, letterSpacing: '0.05em', cursor: 'pointer' }}>
+                  Sold by <span style={{ color: '#c9933a', fontWeight: 600, textDecoration: 'underline' }}>{viewProduct.vendor.shopName}</span>
+                  {viewProduct.vendor.verified && <span style={{ marginLeft: 6 }}>✓</span>}
                 </div>
               )}
               <div className="col-view-divider" />
@@ -658,9 +657,9 @@ export default function Collections({ settings }) {
                       <div key={r._id} className="rv-item">
                         <div className="rv-item-head">
                           <span className="rv-item-name">{r.name}</span>
-                          <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <Stars rating={r.rating} size={11} />
-                            <span className="rv-item-date">{new Date(r.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span>
+                            <span className="rv-item-date">{new Date(r.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
                           </div>
                         </div>
                         <div className="rv-item-comment">{r.comment}</div>
@@ -677,12 +676,12 @@ export default function Collections({ settings }) {
 
                 {showReviewForm && (
                   <div className="rv-form">
-                    <input className="rv-input" placeholder="Your name" value={reviewForm.name} onChange={e => setReviewForm({...reviewForm, name:e.target.value})} />
+                    <input className="rv-input" placeholder="Your name" value={reviewForm.name} onChange={e => setReviewForm({ ...reviewForm, name: e.target.value })} />
                     <div>
-                      <div className="rv-title" style={{ marginBottom:6 }}>Rating</div>
+                      <div className="rv-title" style={{ marginBottom: 6 }}>Rating</div>
                       <div className="rv-star-row">
-                        {[1,2,3,4,5].map(s => (
-                          <button key={s} className="rv-star-btn" onClick={() => setReviewForm({...reviewForm, rating:s})}>
+                        {[1, 2, 3, 4, 5].map(s => (
+                          <button key={s} className="rv-star-btn" onClick={() => setReviewForm({ ...reviewForm, rating: s })}>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill={s <= reviewForm.rating ? '#c9933a' : 'none'} stroke="#c9933a" strokeWidth="1.5">
                               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                             </svg>
@@ -690,7 +689,7 @@ export default function Collections({ settings }) {
                         ))}
                       </div>
                     </div>
-                    <textarea className="rv-input" rows={3} placeholder="Share your thoughts…" value={reviewForm.comment} onChange={e => setReviewForm({...reviewForm, comment:e.target.value})} />
+                    <textarea className="rv-input" rows={3} placeholder="Share your thoughts…" value={reviewForm.comment} onChange={e => setReviewForm({ ...reviewForm, comment: e.target.value })} />
                     {reviewError && <div className="rv-error">✕ {reviewError}</div>}
                     <div className="rv-form-actions">
                       <button className="rv-cancel-btn" onClick={() => { setShowReviewForm(false); setReviewError('') }}>Cancel</button>

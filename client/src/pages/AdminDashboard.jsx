@@ -6,7 +6,7 @@ import {
   fetchAllCollections, createCollection, updateCollection, deleteCollection,
   fetchSettings, updateSettings as saveSettings,
   changePassword, addAdmin, fetchAdmins, deleteAdmin,
-  fetchAllVendors, updateVendorStatus, toggleVendorVerified, deleteVendor,
+  fetchAllVendors, updateVendorStatus, toggleVendorVerified, deleteVendor, fetchAllReviews, deleteReview,
 } from '../utils/api'
 
 const STYLES = `
@@ -166,6 +166,7 @@ export default function AdminDashboard() {
             {activeTab === 'collections' && <CollectionsTab />}
             {activeTab === 'settings' && <SettingsTab />}
             {activeTab === 'account' && <AccountTab />}
+            {activeTab === 'reviews' && <ReviewsTab />}
           </main>
         </div>
 
