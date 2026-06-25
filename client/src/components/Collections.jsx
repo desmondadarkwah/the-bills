@@ -146,7 +146,7 @@ export default function Collections({ settings }) {
   const closeView = () => setViewProduct(null)
 
   const handleReviewSubmit = async () => {
-    if (!reviewForm.name.trim() || !reviewForm.comment.trim()) { setReviewError('Please fill in all fields.'); return }
+    if (!reviewForm.comment.trim() || !reviewForm.comment.trim()) { setReviewError('Please leave a review.'); return }
     setReviewSubmitting(true); setReviewError('')
     try {
       await submitReview({ product: viewProduct._id, ...reviewForm })
