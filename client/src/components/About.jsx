@@ -6,8 +6,8 @@ export default function About({ settings }) {
       <style>{`
         .about-root {
           background: #0d0a06;
-          padding: 120px 48px;
           position: relative;
+          padding: 120px 48]px;
           overflow: hidden;
           font-family: 'Barlow', sans-serif;
         }

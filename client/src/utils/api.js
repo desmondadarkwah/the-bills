@@ -176,3 +176,24 @@ export const changeVendorPassword = async (payload) => {
   const { data } = await axiosInstance.put('/api/vendors/me/password', payload)
   return data
 }
+
+// ─── REVIEWS ──────────────────────────────────────────
+export const submitReview = async (payload) => {
+  const { data } = await axiosInstance.post('/api/reviews', payload)
+  return data.data
+}
+
+export const fetchProductReviews = async (productId) => {
+  const { data } = await axiosInstance.get(`/api/reviews/${productId}`)
+  return data
+}
+
+export const fetchAllReviews = async () => {
+  const { data } = await axiosInstance.get('/api/reviews')
+  return data.data || []
+}
+
+export const deleteReview = async (id) => {
+  const { data } = await axiosInstance.delete(`/api/reviews/${id}`)
+  return data
+}
