@@ -278,8 +278,8 @@ export default function Collections({ settings }) {
         .col-card-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; background: linear-gradient(to top, rgba(10,8,6,0.95) 0%, rgba(10,8,6,0.15) 55%, transparent 100%); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
         .col-card:hover .col-card-overlay { opacity: 1; pointer-events: auto; }
         @media (max-width: 768px) { .col-card-overlay { opacity: 1; pointer-events: auto; } }
-        .col-card-actions { display: flex; gap: 4px; margin-top: 52px; }
-        .col-card-btn { flex: 1; padding: 9px 6px; font-size: 8.5px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s; }
+        .col-card-actions { display: flex; gap: 4px; margin-top: 48px; }
+        .col-card-btn { flex: 1; padding: 6px 6px; font-size: 7.5px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.2s; }
         .col-card-btn-wa { background: transparent; color: #c9933a; border: 1px solid #c9933a; }
         .col-card-btn-wa:hover { background: #c9933a; color: #0a0806; }
         .col-card-btn-dm { background: rgba(201,147,58,0.08); color: #c9933a; border: 1px solid rgba(201,147,58,0.2); }
