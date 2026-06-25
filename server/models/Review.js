@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 const reviewSchema = new mongoose.Schema({
   product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  name: { type: String, required: true, trim: true },
+  name: { type: String, default: 'Anonymous', trim: true },
   rating: { type: Number, required: true, min: 1, max: 5 },
   comment: { type: String, required: true, trim: true },
   approved: { type: Boolean, default: true },

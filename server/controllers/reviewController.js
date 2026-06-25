@@ -5,8 +5,8 @@ import Product from '../models/Product.js'
 export const createReview = async (req, res) => {
   try {
     const { product, name, rating, comment } = req.body
-    if (!product || !name || !rating || !comment)
-      return res.status(400).json({ error: 'All fields are required.' })
+    if (!product || !rating || !comment)
+      return res.status(400).json({ error: 'Rating and Comment are required.' })
     const exists = await Product.findById(product)
     if (!exists) return res.status(404).json({ error: 'Product not found.' })
     const review = await Review.create({ product, name, rating, comment })
