@@ -117,7 +117,7 @@ export default function Collections({ settings }) {
   const filters = ['All', ...collections.map(c => c.name)]
   const filtered = activeFilter === 'All' ? products : products.filter(p => p.collection === activeFilter)
   const featured = products.filter(p => p.featured)
-  const newArrivals = [...products].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 12)
+  const newArrivals = [...products].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 20)
   const mostViewed = [...products].sort((a, b) => (b.views || 0) - (a.views || 0)).filter(p => (p.views || 0) > 0).slice(0, 10)
 
   const toggleWishlist = (id) => {
