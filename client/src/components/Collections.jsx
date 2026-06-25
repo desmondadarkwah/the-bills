@@ -656,7 +656,7 @@ export default function Collections({ settings }) {
                     {reviews.map(r => (
                       <div key={r._id} className="rv-item">
                         <div className="rv-item-head">
-                          <span className="rv-item-name">{r.name}</span>
+                          <span className="rv-item-name">{r.name || 'Anonymous'}</span>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <Stars rating={r.rating} size={11} />
                             <span className="rv-item-date">{new Date(r.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
