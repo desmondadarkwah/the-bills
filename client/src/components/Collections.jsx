@@ -566,7 +566,7 @@ export default function Collections({ settings }) {
                       {!selectMode && (
                         <div className="col-card-overlay">
                           <div className="col-card-actions">
-                            <button className="col-card-btn col-card-btn-wa" onClick={e => { e.stopPropagation(); handleWhatsApp(product) }}><WhatsAppIcon /> WhatsApp</button>
+                            <button className="col-card-btn col-card-btn-wa" onClick={e => { e.stopPropagation(); handleWhatsApp(product) }}><WhatsAppIcon /> </button>
                             <button className="col-card-btn col-card-btn-dm" onClick={e => { e.stopPropagation(); window.open(settings?.instagram || '#', '_blank') }}>DM Us</button>
                           </div>
                         </div>
