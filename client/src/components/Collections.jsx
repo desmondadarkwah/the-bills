@@ -81,7 +81,7 @@ export default function Collections({ settings }) {
   const [reviewsLoading, setReviewsLoading] = useState(false)
   const [reviewAvg, setReviewAvg] = useState(0)
   const [showReviewForm, setShowReviewForm] = useState(false)
-  const [reviewForm, setReviewForm] = useState({ name: '', rating: 5, comment: '' })
+  const [reviewForm, setReviewForm] = useState({ name: user?.name || '', rating: 5, comment: '' })
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewSuccess, setReviewSuccess] = useState(false)
   const [reviewError, setReviewError] = useState('')
@@ -123,7 +123,14 @@ export default function Collections({ settings }) {
 
   // Load reviews when product opens
   useEffect(() => {
-    if (!viewProduct) { setReviews([]); setReviewAvg(0); setShowReviewForm(false); setReviewSuccess(false); return }
+    if (!viewProduct) {
+      setReviews([])
+      setReviewAvg(0)
+      setShowReviewForm(false)
+      setReviewSuccess(false)
+      setReviewForm({ name: user?.name || '', rating: 5, comment: '' })
+      return
+    }
     setReviewsLoading(true)
     fetchProductReviews(viewProduct._id)
       .then(data => { setReviews(data.data || []); setReviewAvg(data.avg || 0) })
@@ -713,7 +720,14 @@ export default function Collections({ settings }) {
 
                 {showReviewForm && (
                   <div className="rv-form">
-                    <input className="rv-input" placeholder="Your name" value={reviewForm.name} onChange={e => setReviewForm({ ...reviewForm, name: e.target.value })} />
+                    {!user && (
+                      <input className="rv-input" placeholder="Your name (optional)" value={reviewForm.name} onChange={e => setReviewForm({ ...reviewForm, name: e.target.value })} />
+                    )}
+                    {user && (
+                      <div style={{ padding: '10px 12px', background: 'rgba(201,147,58,0.05)', border: '1px solid rgba(201,147,58,0.15)', fontSize: 12, color: 'rgba(245,237,224,0.5)', letterSpacing: '0.05em' }}>
+                        Reviewing as <span style={{ color: '#c9933a' }}>{user.name}</span>
+                      </div>
+                    )}
                     <div>
                       <div className="rv-title" style={{ marginBottom: 6 }}>Rating</div>
                       <div className="rv-star-row">
