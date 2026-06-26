@@ -228,3 +228,14 @@ export const syncWishlistDB = async (productIds) => {
   const { data } = await axiosInstance.put('/api/users/wishlist/sync', { productIds })
   return data.wishlist
 }
+
+// ─── ADMIN: USERS ─────────────────────────────────────
+export const fetchAllUsers = async () => {
+  const { data } = await axiosInstance.get('/api/users/all')
+  return data.data || []
+}
+
+export const deleteUser = async (id) => {
+  const { data } = await axiosInstance.delete(`/api/users/${id}`)
+  return data
+}

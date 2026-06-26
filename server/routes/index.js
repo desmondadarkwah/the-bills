@@ -17,7 +17,8 @@ import {
   getAllVendors, updateVendorStatus, toggleVendorVerified, deleteVendor,  updateVendorProfile, changeVendorPassword,
 } from '../controllers/vendorController.js'
 import { createReview, getProductReviews, getAllReviews, deleteReview } from '../controllers/reviewController.js'
-import { registerUser, loginUser, getUserMe, addToWishlist, removeFromWishlist, syncWishlist } from '../controllers/userController.js'
+import { registerUser, loginUser, getUserMe, addToWishlist, removeFromWishlist, syncWishlist, getAllUsers, deleteUser } from '../controllers/userController.js'
+
 
 const router = express.Router()
 
@@ -88,5 +89,7 @@ router.get('/users/me', protectUser, getUserMe)
 router.put('/users/wishlist/add', protectUser, addToWishlist)
 router.put('/users/wishlist/remove', protectUser, removeFromWishlist)
 router.put('/users/wishlist/sync', protectUser, syncWishlist)
+router.get('/users/all', protect, getAllUsers)
+router.delete('/users/:id', protect, deleteUser)
 
 export default router
