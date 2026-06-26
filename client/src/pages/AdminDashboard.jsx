@@ -6,7 +6,7 @@ import {
   fetchAllCollections, createCollection, updateCollection, deleteCollection,
   fetchSettings, updateSettings as saveSettings,
   changePassword, addAdmin, fetchAdmins, deleteAdmin,
-  fetchAllVendors, updateVendorStatus, toggleVendorVerified, deleteVendor, fetchAllReviews, deleteReview,
+  fetchAllVendors, updateVendorStatus, toggleVendorVerified, deleteVendor, fetchAllReviews, deleteReview, fetchAllUsers, deleteUser,
 } from '../utils/api'
 
 const STYLES = `
@@ -120,7 +120,8 @@ export default function AdminDashboard() {
     { id: 'collections', label: 'Collections', icon: '🗂️', group: 'content' },
     { id: 'settings', label: 'Settings', icon: '⚙️', group: 'system' },
     { id: 'account', label: 'Account', icon: '👤', group: 'system' },
-    { id: 'reviews', label: 'Reviews', icon: '⭐', group: 'content' }
+    { id: 'reviews', label: 'Reviews', icon: '⭐', group: 'content' },
+    { id: 'users', label: 'Users', icon: '👥', group: 'main' },
   ]
 
   return (
@@ -161,12 +162,13 @@ export default function AdminDashboard() {
 
           <main className="adm-main">
             {activeTab === 'overview' && <OverviewTab />}
+            {activeTab === 'users' && <UsersTab />}
             {activeTab === 'vendors' && <VendorsTab />}
             {activeTab === 'products' && <ProductsTab />}
             {activeTab === 'collections' && <CollectionsTab />}
+            {activeTab === 'reviews' && <ReviewsTab />}
             {activeTab === 'settings' && <SettingsTab />}
             {activeTab === 'account' && <AccountTab />}
-            {activeTab === 'reviews' && <ReviewsTab />}
           </main>
         </div>
 
@@ -322,6 +324,47 @@ function OverviewTab() {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  )
+}
+
+function UsersTab() {
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => { load() }, [])
+  const load = () => fetchAllUsers().then(d => { setUsers(d); setLoading(false) }).catch(console.error)
+
+  const del = async (id) => {
+    if (!confirm('Delete this user? This cannot be undone.')) return
+    await deleteUser(id); load()
+  }
+
+  return (
+    <div>
+      <h2 className="adm-page-title"><span>👥</span>Users</h2>
+      <div className="adm-card">
+        {loading
+          ? <div className="adm-empty"><p>Loading…</p></div>
+          : users.length === 0
+            ? <div className="adm-empty"><div className="adm-empty-icon">TB</div><p>No registered users yet.</p></div>
+            : users.map(u => (
+              <div key={u._id} className="adm-row">
+                <div style={{ width: 40, height: 40, background: 'rgba(201,147,58,0.1)', border: '1px solid rgba(201,147,58,0.2)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: "'Cormorant Garamond',serif", fontWeight: 700, fontSize: 16, color: '#c9933a' }}>
+                  {u.name?.charAt(0).toUpperCase()}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="adm-row-name">{u.name}</div>
+                  <div className="adm-row-sub">{u.email}</div>
+                  <div className="adm-row-sub">
+                    {u.wishlist?.length || 0} saved pieces · Joined {new Date(u.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </div>
+                </div>
+                <button className="adm-btn adm-btn-red adm-btn-sm" onClick={() => del(u._id)}>Delete</button>
+              </div>
+            ))
+        }
       </div>
     </div>
   )
@@ -807,3 +850,4 @@ function AccountTab() {
     </div>
   )
 }
+

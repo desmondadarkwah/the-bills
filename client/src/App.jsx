@@ -6,18 +6,22 @@ import AdminDashboard from './pages/AdminDashboard'
 import VendorRegister from './pages/VendorRegister'
 import VendorLogin from './pages/VendorLogin'
 import VendorDashboard from './pages/VendorDashboard'
+import VendorStorefront from './pages/VendorStorefront'
+import UserLogin from './pages/UserLogin'
+import UserRegister from './pages/UserRegister'
 import ProtectedRoute from './components/ProtectedRoute'
 import VendorProtectedRoute from './components/VendorProtectedRoute'
 import NotFound from './pages/NotFound'
-import VendorStorefront from './pages/VendorStorefront'
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/wishlist" element={<Wishlist />} />
-
       <Route path="/shop/:id" element={<VendorStorefront />} />
+
+      <Route path="/login" element={<UserLogin />} />
+      <Route path="/register" element={<UserRegister />} />
 
       <Route path="/manage/login" element={<AdminLogin />} />
       <Route path="/manage" element={
