@@ -66,6 +66,7 @@ function ScrollProgress({ scrollRef }) {
 }
 
 export default function Collections({ settings }) {
+  const { user, updateWishlist } = useUserAuth()
   const [products, setProducts] = useState([])
   const [collections, setCollections] = useState([])
   const [activeFilter, setActiveFilter] = useState('All')
@@ -92,7 +93,6 @@ export default function Collections({ settings }) {
   const mvRef = useRef(null)
   const newRef = useRef(null)
   const navigate = useNavigate()
-  const { user, updateWishlist } = useUserAuth()
 
   useEffect(() => {
     Promise.all([fetchProducts(), fetchCollections()])
