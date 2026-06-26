@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { fetchProducts, fetchCollections, trackProductView, trackProductClick, fetchProductReviews, submitReview } from '../utils/api'
+import { fetchProducts, fetchCollections, trackProductView, trackProductClick, fetchProductReviews, submitReview, addToWishlistDB, removeFromWishlistDB } from '../utils/api'
 import { useNavigate } from 'react-router-dom'
+import { useUserAuth } from '../context/UserAuthContext'
 
 const WhatsAppIcon = () => (
   <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
@@ -85,19 +86,35 @@ export default function Collections({ settings }) {
   const [reviewSuccess, setReviewSuccess] = useState(false)
   const [reviewError, setReviewError] = useState('')
 
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+
   const featRef = useRef(null)
   const mvRef = useRef(null)
   const newRef = useRef(null)
   const navigate = useNavigate()
+  const { user, updateWishlist } = useUserAuth()
 
   useEffect(() => {
     Promise.all([fetchProducts(), fetchCollections()])
       .then(([p, c]) => { setProducts(p); setCollections(c) })
       .catch(console.error)
       .finally(() => setLoading(false))
-    const saved = localStorage.getItem('bills_wishlist')
-    if (saved) setWishlist(JSON.parse(saved))
+
+    // Load wishlist — from DB if logged in, localStorage if not
+    if (user) {
+      setWishlist(user.wishlist?.map(p => p._id || p) || [])
+    } else {
+      const saved = localStorage.getItem('bills_wishlist')
+      if (saved) setWishlist(JSON.parse(saved))
+    }
   }, [])
+
+  // Sync wishlist when user logs in
+  useEffect(() => {
+    if (user) {
+      setWishlist(user.wishlist?.map(p => p._id || p) || [])
+    }
+  }, [user])
 
   useEffect(() => {
     document.body.style.overflow = viewProduct ? 'hidden' : ''
@@ -120,10 +137,30 @@ export default function Collections({ settings }) {
   const newArrivals = [...products].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 12)
   const mostViewed = [...products].sort((a, b) => (b.views || 0) - (a.views || 0)).filter(p => (p.views || 0) > 0).slice(0, 10)
 
-  const toggleWishlist = (id) => {
-    const updated = wishlist.includes(id) ? wishlist.filter(w => w !== id) : [...wishlist, id]
-    setWishlist(updated)
-    localStorage.setItem('bills_wishlist', JSON.stringify(updated))
+  const toggleWishlist = async (id) => {
+    const isWishlisted = wishlist.includes(id)
+
+    if (user) {
+      // Logged in — save to DB
+      try {
+        const updated = isWishlisted
+          ? await removeFromWishlistDB(id)
+          : await addToWishlistDB(id)
+        const ids = updated.map(p => p._id || p)
+        setWishlist(ids)
+        updateWishlist(updated)
+      } catch (e) { console.error(e) }
+    } else {
+      // Not logged in — save to localStorage + prompt
+      const updated = isWishlisted
+        ? wishlist.filter(w => w !== id)
+        : [...wishlist, id]
+      setWishlist(updated)
+      localStorage.setItem('bills_wishlist', JSON.stringify(updated))
+
+      // Show login prompt if they just added (not removed)
+      if (!isWishlisted) setShowLoginPrompt(true)
+    }
   }
 
   const toggleSelect = (id) => setSelected(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id])
@@ -698,6 +735,29 @@ export default function Collections({ settings }) {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* LOGIN PROMPT */}
+      {showLoginPrompt && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(5,4,3,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '0 0 0 0' }} onClick={e => e.target === e.currentTarget && setShowLoginPrompt(false)}>
+          <div style={{ width: '100%', maxWidth: 480, background: '#0d0a06', border: '1px solid rgba(201,147,58,0.2)', borderBottom: 'none', padding: '32px 28px 40px', animation: 'colSlideUp 0.3s cubic-bezier(0.16,1,0.3,1)' }}>
+            <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 22, fontWeight: 500, color: '#f5ede0', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Save Your Pieces</div>
+            <p style={{ fontFamily: "'Cormorant Garamond',serif", fontStyle: 'italic', fontSize: 14, color: 'rgba(245,237,224,0.4)', lineHeight: 1.7, marginBottom: 24 }}>
+              Create a free account to save pieces across all your devices — phone, tablet, and desktop.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <a href="/register" style={{ display: 'block', padding: '14px', background: '#c9933a', color: '#0a0806', fontFamily: "'Barlow',sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: '0.25em', textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center' }}>
+                Create Free Account
+              </a>
+              <a href="/login" style={{ display: 'block', padding: '14px', background: 'transparent', color: 'rgba(245,237,224,0.5)', fontFamily: "'Barlow',sans-serif", fontSize: 10, fontWeight: 500, letterSpacing: '0.25em', textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center', border: '1px solid rgba(201,147,58,0.2)' }}>
+                Sign In
+              </a>
+              <button onClick={() => setShowLoginPrompt(false)} style={{ padding: '12px', background: 'transparent', color: 'rgba(245,237,224,0.2)', fontFamily: "'Barlow',sans-serif", fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>
+                Save on this device only
+              </button>
             </div>
           </div>
         </div>

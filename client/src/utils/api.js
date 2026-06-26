@@ -197,3 +197,34 @@ export const deleteReview = async (id) => {
   const { data } = await axiosInstance.delete(`/api/reviews/${id}`)
   return data
 }
+
+// ─── USER AUTH ────────────────────────────────────────
+export const registerUser = async (payload) => {
+  const { data } = await axiosInstance.post('/api/users/register', payload)
+  return data
+}
+
+export const loginUser = async (payload) => {
+  const { data } = await axiosInstance.post('/api/users/login', payload)
+  return data
+}
+
+export const fetchUserMe = async () => {
+  const { data } = await axiosInstance.get('/api/users/me')
+  return data.user
+}
+
+export const addToWishlistDB = async (productId) => {
+  const { data } = await axiosInstance.put('/api/users/wishlist/add', { productId })
+  return data.wishlist
+}
+
+export const removeFromWishlistDB = async (productId) => {
+  const { data } = await axiosInstance.put('/api/users/wishlist/remove', { productId })
+  return data.wishlist
+}
+
+export const syncWishlistDB = async (productIds) => {
+  const { data } = await axiosInstance.put('/api/users/wishlist/sync', { productIds })
+  return data.wishlist
+}

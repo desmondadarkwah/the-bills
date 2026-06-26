@@ -1,5 +1,5 @@
 import express from 'express'
-import { protect, protectVendor } from '../middleware/authMiddleware.js'
+import { protect, protectVendor, protectUser } from '../middleware/authMiddleware.js'
 import { upload } from '../middleware/uploadMiddleware.js'
 
 import { setupAdmin, loginAdmin, getMe, changePassword, addAdmin, getAdmins, deleteAdmin } from '../controllers/authController.js'
@@ -15,9 +15,9 @@ import { getSettings, updateSettings } from '../controllers/settingsController.j
 import {
   registerVendor, loginVendor, getVendorMe, getVendorPublic,
   getAllVendors, updateVendorStatus, toggleVendorVerified, deleteVendor,  updateVendorProfile, changeVendorPassword,
-
 } from '../controllers/vendorController.js'
 import { createReview, getProductReviews, getAllReviews, deleteReview } from '../controllers/reviewController.js'
+import { registerUser, loginUser, getUserMe, addToWishlist, removeFromWishlist, syncWishlist } from '../controllers/userController.js'
 
 const router = express.Router()
 
@@ -80,5 +80,13 @@ router.post('/reviews', createReview)
 router.get('/reviews/:productId', getProductReviews)
 router.get('/reviews', protect, getAllReviews)
 router.delete('/reviews/:id', protect, deleteReview)
+
+// ─── USER AUTH ────────────────────────────────────────
+router.post('/users/register', registerUser)
+router.post('/users/login', loginUser)
+router.get('/users/me', protectUser, getUserMe)
+router.put('/users/wishlist/add', protectUser, addToWishlist)
+router.put('/users/wishlist/remove', protectUser, removeFromWishlist)
+router.put('/users/wishlist/sync', protectUser, syncWishlist)
 
 export default router
