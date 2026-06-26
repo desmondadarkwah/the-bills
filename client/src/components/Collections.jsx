@@ -742,8 +742,8 @@ export default function Collections({ settings }) {
 
       {/* LOGIN PROMPT */}
       {showLoginPrompt && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(5,4,3,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '0 0 0 0' }} onClick={e => e.target === e.currentTarget && setShowLoginPrompt(false)}>
-          <div style={{ width: '100%', maxWidth: 480, background: '#0d0a06', border: '1px solid rgba(201,147,58,0.2)', borderBottom: 'none', padding: '32px 28px 40px', animation: 'colSlideUp 0.3s cubic-bezier(0.16,1,0.3,1)' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(5,4,3,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} onClick={e => e.target === e.currentTarget && setShowLoginPrompt(false)}>
+          <div style={{ width: '100%', maxWidth: 420, background: '#0d0a06', border: '1px solid rgba(201,147,58,0.2)', borderBottom: 'none', padding: '32px 28px 40px', animation: 'colSlideUp 0.3s cubic-bezier(0.16,1,0.3,1)' }}>
             <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 22, fontWeight: 500, color: '#f5ede0', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Save Your Pieces</div>
             <p style={{ fontFamily: "'Cormorant Garamond',serif", fontStyle: 'italic', fontSize: 14, color: 'rgba(245,237,224,0.4)', lineHeight: 1.7, marginBottom: 24 }}>
               Create a free account to save pieces across all your devices — phone, tablet, and desktop.
